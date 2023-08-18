@@ -22,18 +22,23 @@ export class ExcelView extends TextFileView {
 	setViewData(data: string, clear: boolean): void {
 		this.data = data;
 
-		this.containerEl.empty();
-		this.containerEl.createDiv({
+		this.contentEl.empty();
+		this.contentEl.createDiv({
 			attr: {
-				id: "x-spreadsheet"
-				// class: "sheet-box"
+				id: "x-spreadsheet",
+				class: "sheet-box",
 			},
 		});
 
-		console.log(this.ownerWindow, this.data);
+		console.log(this.ownerWindow.document.documentElement.clientWidth);
 		const jsonData = JSON.parse(this.data || "{}") || {}
 		//@ts-ignore
-		this.sheet = new Spreadsheet("#x-spreadsheet")
+		this.sheet = new Spreadsheet("#x-spreadsheet", {
+			view: {
+				height: () => this.contentEl.clientHeight,
+				width: () => this.contentEl.clientWidth,
+			  },
+		})
 		.loadData(jsonData) // load data
 		.change(data => {
 		  // save data to db
