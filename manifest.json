@@ -1,11 +1,11 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
+	"id": "com.ljcoder.obsidian-excel",
+	"name": "Excel",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "This is a sample plugin for Obsidian. This plugin demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"description": "This is a Excel plugin for Obsidian.",
+	"author": "ljcoder",
+	"authorUrl": "https://github.com/ljcoder2015/obsidian-excel",
+	"fundingUrl": "https://github.com/ljcoder2015/obsidian-excel",
 	"isDesktopOnly": false
 }
