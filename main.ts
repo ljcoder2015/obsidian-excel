@@ -1,46 +1,139 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, WorkspaceLeaf } from 'obsidian';
+import { TFile, Plugin, WorkspaceLeaf, normalizePath } from "obsidian";
+import { ExcelSettings, DEFAULT_SETTINGS } from "./src/utils/Settings";
+import {
+	emulateCTRLClickForLinks,
+	linkClickModifierType,
+	PaneTarget,
+} from "./src/utils/ModifierkeyHelper";
+import { ExcelView, VIEW_TYPE_EXCEL } from "./src/ExcelView";
+import {
+	checkAndCreateFolder,
+	getNewUniqueFilepath,
+	getExcelFilename,
+} from "./src/utils/FileUtils";
 
-import { ExcelView, VIEW_TYPE_EXCEL } from './src/ExcelView';
+import { getNewOrAdjacentLeaf } from "./src/utils/ObsidianUtils";
+
+declare const PLUGIN_VERSION: string;
 
 export default class ExcelPlugin extends Plugin {
+	public settings: ExcelSettings;
 
 	async onload() {
-
-		this.registerView(VIEW_TYPE_EXCEL, (leaf: WorkspaceLeaf) => new ExcelView(leaf, this));
+		this.registerView(
+			VIEW_TYPE_EXCEL,
+			(leaf: WorkspaceLeaf) => new ExcelView(leaf, this)
+		);
 		this.registerExtensions(["xlsx"], VIEW_TYPE_EXCEL);
 
 		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('table', 'Excel', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
+		const ribbonIconEl = this.addRibbonIcon(
+			"table",
+			"Excel",
+			(e: MouseEvent) => {
+				// Called when the user clicks the icon.
+				this.createAndOpenExcel(
+					getExcelFilename(this.settings)
+				);
+			}
+		);
 		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
+		ribbonIconEl.addClass("my-plugin-ribbon-class");
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
-
+		statusBarItemEl.setText("Status Bar Text");
 
 		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
 		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
+		this.registerDomEvent(document, "click", (evt: MouseEvent) => {
+			console.log("click", evt);
 		});
 
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		this.registerInterval(
+			window.setInterval(() => console.log("setInterval"), 5 * 60 * 1000)
+		);
 	}
 
-	onunload() {
+	onunload() {}
 
+	async loadSettings() {
+		this.settings = Object.assign(
+			{},
+			DEFAULT_SETTINGS,
+			await this.loadData()
+		);
 	}
 
-	// async loadSettings() {
-	// 	this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	// }
+	async saveSettings() {
+		await this.saveData(this.settings);
+	}
 
-	// async saveSettings() {
-	// 	await this.saveData(this.settings);
-	// }
+	public async createExcel(
+		filename: string,
+		foldername?: string,
+		initData?: string
+	): Promise<TFile> {
+		// const folderpath = normalizePath(
+		// 	foldername ? foldername : "Excel"
+		// );
+		// await checkAndCreateFolder(folderpath); //create folder if it does not exist
+		const fname = normalizePath(filename);
+		const file = await this.app.vault.create(fname, initData ?? "{}");
+
+		return file;
+	}
+
+	public async createAndOpenExcel(
+		filename: string,
+		foldername?: string,
+		initData?: string
+	): Promise<string> {
+		const file = await this.createExcel(filename, foldername, initData);
+		this.openExcel(file, "new-pane", true, undefined);
+		return file.path;
+	}
+
+	public openExcel(
+		excelFile: TFile,
+		location: PaneTarget,
+		active: boolean = false,
+		subpath?: string
+	) {
+		if (location === "md-properties") {
+			location = "new-tab";
+		}
+		var leaf: WorkspaceLeaf;
+		if (location === "popout-window") {
+			leaf = app.workspace.openPopoutLeaf();
+		}
+		if (location === "new-tab") {
+			leaf = app.workspace.getLeaf("tab");
+		}
+		if (!leaf) {
+			leaf = this.app.workspace.getLeaf(false);
+			if (
+				leaf.view.getViewType() !== "empty" &&
+				location === "new-pane"
+			) {
+				leaf = app.workspace.getMostRecentLeaf();
+			}
+		}
+
+		leaf.openFile(
+			excelFile,
+			!subpath || subpath === ""
+				? { active }
+				: { active, eState: { subpath } }
+		).then(() => {});
+	}
+
+	public isExcelFile(f: TFile) {
+		if (!f) return false;
+		if (f.extension === "xlsx") {
+			return true;
+		}
+		return false
+	}
 }

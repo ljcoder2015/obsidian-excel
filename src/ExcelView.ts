@@ -30,22 +30,22 @@ export class ExcelView extends TextFileView {
 			},
 		});
 
-		console.log(this.ownerWindow.document.documentElement.clientWidth);
-		const jsonData = JSON.parse(this.data || "{}") || {}
+		const jsonData = JSON.parse(this.data || "{}") || {};
+
 		//@ts-ignore
 		this.sheet = new Spreadsheet("#x-spreadsheet", {
 			view: {
 				height: () => this.contentEl.clientHeight,
 				width: () => this.contentEl.clientWidth,
-			  },
+			},
 		})
-		.loadData(jsonData) // load data
-		.change(data => {
-		  // save data to db
-		  this.data = JSON.stringify(data);
-		});
+			.loadData(jsonData) // load data
+			.change((data) => {
+				// save data to db
+				this.data = JSON.stringify(data);
+			});
 
-		this.sheet.validate()
+		this.sheet.validate();
 	}
 
 	onload(): void {
