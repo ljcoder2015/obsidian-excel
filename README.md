@@ -1,7 +1,13 @@
 # Obsidian Excel Plugin
 
-## 功能简介
-一款能够创建 Excel 文件的 Obsidian 插件，支持基础的表格操作，筛选，冻结，基础函数等
+## Excel
+The Obsidian-Excel plugin integrates [x-spreadsheet](https://github.com/myliang/x-spreadsheet), a feature sheet tool, into Obsidian. You can store and edit `xlsx` files in your vault.
+
 ![Alt text](./doc/img/image.png)
+
+## LICENSE
+```
+GNU GPLv3
+```
 
 
