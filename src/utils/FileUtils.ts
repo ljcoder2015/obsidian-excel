@@ -77,7 +77,7 @@ export function getNewUniqueFilepath(
   folderpath: string,
 ): string {
   let fname = normalizePath(`${folderpath}/${filename}`);
-  let file: TAbstractFile = vault.getAbstractFileByPath(fname);
+  let file: TAbstractFile | null = vault.getAbstractFileByPath(fname);
   let i = 0;
   const extension = filename.endsWith(".xlsx.md")
     ? ".xlsx.md"

@@ -51,7 +51,7 @@ export const getNewOrAdjacentLeaf = (
 
 	const getMostRecentOrAvailableLeafInMainWorkspace = (
 		inDifferentTabGroup?: boolean
-	): WorkspaceLeaf => {
+	): WorkspaceLeaf | null => {
 		let mainLeaf = app.workspace.getMostRecentLeaf();
 		if (
 			mainLeaf &&
@@ -86,22 +86,22 @@ export const getNewOrAdjacentLeaf = (
 		return ml ?? app.workspace.createLeafBySplit(leaf); //app.workspace.getLeaf(true);
 	}
 
-	//3
-	if (leafLoc === "hover") {
-		const leaves = new Set<WorkspaceLeaf>();
-		app.workspace.iterateAllLeaves((l) => {
-			//@ts-ignore
-			if (
-				l !== leaf &&
-				leaf.containerEl.parentElement === l.containerEl.parentElement
-			)
-				leaves.add(l);
-		});
-		if (leaves.size === 0) {
-			return plugin.app.workspace.createLeafBySplit(leaf);
-		}
-		return Array.from(leaves)[0];
-	}
+	// //3
+	// if (leafLoc === "hover") {
+	// 	const leaves = new Set<WorkspaceLeaf>();
+	// 	app.workspace.iterateAllLeaves((l) => {
+	// 		//@ts-ignore
+	// 		if (
+	// 			l !== leaf &&
+	// 			leaf.containerEl.parentElement === l.containerEl.parentElement
+	// 		)
+	// 			leaves.add(l);
+	// 	});
+	// 	if (leaves.size === 0) {
+	// 		return plugin.app.workspace.createLeafBySplit(leaf);
+	// 	}
+	// 	return Array.from(leaves)[0];
+	// }
 
 	//4
 	if (leafLoc === "popout") {

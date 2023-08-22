@@ -1,7 +1,7 @@
 {
-	"id": "com.ljcoder.obsidian-excel",
+	"id": "obsidian-excel",
 	"name": "Excel",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"minAppVersion": "0.15.0",
 	"description": "This is a Excel plugin for Obsidian.",
 	"author": "ljcoder",

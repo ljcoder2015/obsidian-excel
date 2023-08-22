@@ -104,7 +104,7 @@ export default class ExcelPlugin extends Plugin {
 		if (location === "md-properties") {
 			location = "new-tab";
 		}
-		var leaf: WorkspaceLeaf;
+		var leaf: WorkspaceLeaf | null = null;
 		if (location === "popout-window") {
 			leaf = app.workspace.openPopoutLeaf();
 		}
@@ -121,7 +121,7 @@ export default class ExcelPlugin extends Plugin {
 			}
 		}
 
-		leaf.openFile(
+		leaf?.openFile(
 			excelFile,
 			!subpath || subpath === ""
 				? { active }
