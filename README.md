@@ -5,9 +5,8 @@ The Obsidian-Excel plugin integrates [x-spreadsheet](https://github.com/myliang/
 
 ![Alt text](./doc/img/image.png)
 
-## LICENSE
-```
-GNU GPLv3
-```
+## TODO
+[X] import/export excel
+[X] link to markdown
 
 

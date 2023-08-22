@@ -5,7 +5,7 @@
 	"minAppVersion": "0.15.0",
 	"description": "This is a Excel plugin for Obsidian.",
 	"author": "ljcoder",
-	"authorUrl": "https://github.com/ljcoder2015/obsidian-excel",
+	"authorUrl": "https://github.com/ljcoder2015",
 	"fundingUrl": "https://github.com/ljcoder2015/obsidian-excel",
 	"isDesktopOnly": false
 }
