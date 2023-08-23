@@ -35,32 +35,37 @@ export class ExcelView extends TextFileView {
 
 		const jsonData = JSON.parse(this.data || "{}") || {};
 
-		//@ts-ignore
-		this.sheet = new Spreadsheet("#x-spreadsheet", {
-			view: {
-				height: () => this.contentEl.clientHeight,
-				width: () => this.contentEl.clientWidth,
-			},
-		})
-			.loadData(jsonData) // load data
-			.change((data) => {
-				// save data to db
-				this.data = JSON.stringify(data);
+		app.workspace.onLayoutReady(async () => {
+			//@ts-ignore
+			this.sheet = new Spreadsheet("#x-spreadsheet", {
+				view: {
+					height: () => this.contentEl.clientHeight,
+					width: () => this.contentEl.clientWidth,
+				},
+			})
+				.loadData(jsonData) // load data
+				.change((data) => {
+					// save data to db
+					this.data = JSON.stringify(data);
+				});
+
+			this.sheet.validate();
+
+			// 导入导出
+			const importInput = this.contentEl.createEl("input", {
+				cls: "import-excel",
+				type: "file",
+				attr: {
+					id: "import",
+					accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+				},
 			});
-
-		this.sheet.validate();
-
-		// 导入导出
-		const importInput = this.contentEl.createEl("input", {
-			cls: "import-excel",
-			type: "file",
-			attr: { id: "import" },
+			importInput.addEventListener(
+				"change",
+				this.handleFile.bind(this),
+				false
+			);
 		});
-		importInput.addEventListener(
-			"change",
-			this.handleFile.bind(this),
-			false
-		);
 	}
 
 	// 处理顶部导入按钮点击事件
@@ -94,9 +99,9 @@ export class ExcelView extends TextFileView {
 
 	handleExportClick(ev: MouseEvent) {
 		var new_wb = xtos(this.sheet.getData()) as XLSX.WorkBook;
-		var title = this.file?.basename ?? "sheet"
-  		/* write file and trigger a download */
-  		XLSX.writeFile(new_wb, title + '.xlsx', {});
+		var title = this.file?.basename ?? "sheet";
+		/* write file and trigger a download */
+		XLSX.writeFile(new_wb, title + ".xlsx", {});
 	}
 
 	onload(): void {
@@ -106,16 +111,12 @@ export class ExcelView extends TextFileView {
 		this.ownerWindow = this.containerEl.win;
 
 		// 添加顶部导入按钮
-		this.importEle = this.addAction(
-			"download",
-			"import xlsx file",
-			(ev) => this.handleImportClick(ev)
+		this.importEle = this.addAction("download", "import xlsx file", (ev) =>
+			this.handleImportClick(ev)
 		);
 
-		this.exportEle = this.addAction(
-			"upload",
-			"export xlsx file",
-			(ev) => this.handleExportClick(ev)
+		this.exportEle = this.addAction("upload", "export xlsx file", (ev) =>
+			this.handleExportClick(ev)
 		);
 	}
 
