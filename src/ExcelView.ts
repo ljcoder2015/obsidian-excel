@@ -61,23 +61,6 @@ export class ExcelView extends TextFileView {
 			this.handleFile.bind(this),
 			false
 		);
-
-		// 添加顶部导入按钮
-		if (!this.importEle) {
-			this.importEle = this.addAction(
-				"download",
-				"import xlsx file",
-				(ev) => this.handleImportClick(ev)
-			);
-		}
-
-		if (!this.exportEle) {
-			this.exportEle = this.addAction(
-				"upload",
-				"export xlsx file",
-				(ev) => this.handleExportClick(ev)
-			);
-		}
 	}
 
 	// 处理顶部导入按钮点击事件
@@ -121,6 +104,19 @@ export class ExcelView extends TextFileView {
 			typeof this.containerEl.onWindowMigrated === "undefined"
 		);
 		this.ownerWindow = this.containerEl.win;
+
+		// 添加顶部导入按钮
+		this.importEle = this.addAction(
+			"download",
+			"import xlsx file",
+			(ev) => this.handleImportClick(ev)
+		);
+
+		this.exportEle = this.addAction(
+			"upload",
+			"export xlsx file",
+			(ev) => this.handleExportClick(ev)
+		);
 	}
 
 	clear(): void {
