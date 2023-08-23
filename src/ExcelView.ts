@@ -12,6 +12,7 @@ export class ExcelView extends TextFileView {
 	public sheet: any;
 	public importEle: HTMLElement;
 	public exportEle: HTMLElement;
+	public sheetEle: HTMLElement;
 
 	constructor(leaf: WorkspaceLeaf, plugin: ExcelPlugin) {
 		super(leaf);
@@ -26,18 +27,18 @@ export class ExcelView extends TextFileView {
 		this.data = data;
 
 		this.contentEl.empty();
-		this.contentEl.createDiv({
-			attr: {
-				id: "x-spreadsheet",
-				class: "sheet-box",
-			},
-		});
-
-		const jsonData = JSON.parse(this.data || "{}") || {};
 
 		app.workspace.onLayoutReady(async () => {
+			this.sheetEle = this.contentEl.createDiv({
+				attr: {
+					id: "x-spreadsheet",
+					class: "sheet-box",
+				},
+			});
+
+			const jsonData = JSON.parse(this.data || "{}") || {};
 			//@ts-ignore
-			this.sheet = new Spreadsheet("#x-spreadsheet", {
+			this.sheet = new Spreadsheet(this.sheetEle, {
 				view: {
 					height: () => this.contentEl.clientHeight,
 					width: () => this.contentEl.clientWidth,
@@ -72,12 +73,9 @@ export class ExcelView extends TextFileView {
 	handleImportClick(ev: MouseEvent) {
 		const importEle = document.getElementById("import");
 		importEle?.click();
-		// 打开文件
-		console.log("handleImportClick", importEle);
 	}
 
 	handleFile(e: Event) {
-		console.log("handleFile", e);
 		//@ts-ignore
 		const files = e.target?.files;
 		var f = files[0];
@@ -85,7 +83,6 @@ export class ExcelView extends TextFileView {
 		var instance = this;
 		reader.onload = (e) => {
 			const data = e.target?.result;
-			console.log(data, instance);
 
 			instance.process_wb(XLSX.read(data));
 		};
