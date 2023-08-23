@@ -5,8 +5,14 @@ The Obsidian-Excel plugin integrates [x-spreadsheet](https://github.com/myliang/
 
 ![Alt text](./doc/img/image.png)
 
+### import/export xlsx file
+If you are using Microsoft Office 365 to create xlsx files, you need to import the display.
+
+![import](./doc/img/import.png)
+
+
 ## TODO
-[X] import/export excel
-[X] link to markdown
+✅ import/export excel
+- [X] link to markdown
 
 
