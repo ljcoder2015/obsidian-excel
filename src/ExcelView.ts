@@ -27,24 +27,8 @@ export class ExcelView extends TextFileView {
 		this.data = data;
 
 		app.workspace.onLayoutReady(async () => {
-			// 延迟 50ms，解决点击新标签时调用过早
-			await sleep(50);
-			this.sheetEle.empty();
-			const jsonData = JSON.parse(this.data || "{}") || {};
-			//@ts-ignore
-			this.sheet = new Spreadsheet(this.sheetEle, {
-				view: {
-					height: () => this.contentEl.clientHeight,
-					width: () => this.contentEl.clientWidth,
-				},
-			})
-				.loadData(jsonData) // load data
-				.change((data) => {
-					// save data to db
-					this.data = JSON.stringify(data);
-				});
-
-			this.sheet.validate();
+			// console.log('setViewData')
+			await this.refresh();
 		});
 	}
 
@@ -81,7 +65,7 @@ export class ExcelView extends TextFileView {
 	}
 
 	onload(): void {
-		console.log("onload");
+		// console.log("onload");
 		const apiMissing = Boolean(
 			typeof this.containerEl.onWindowMigrated === "undefined"
 		);
@@ -129,5 +113,30 @@ export class ExcelView extends TextFileView {
 
 	getViewType(): string {
 		return VIEW_TYPE_EXCEL;
+	}
+
+	refresh() {
+		this.sheetEle.empty();
+		const jsonData = JSON.parse(this.data || "{}") || {};
+		//@ts-ignore
+		this.sheet = new Spreadsheet(this.sheetEle, {
+				view: {
+					height: () => this.contentEl.clientHeight,
+					width: () => this.contentEl.clientWidth,
+				},
+			})
+			.loadData(jsonData) // load data
+			.change((data) => {
+				// save data to db
+				this.data = JSON.stringify(data);
+			});
+
+		this.sheet.validate();
+	}
+
+	onResize() {
+		this.refresh();
+		// console.log('resize')
+		super.onResize()
 	}
 }
