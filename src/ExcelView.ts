@@ -1,5 +1,5 @@
 import ExcelPlugin from "main";
-import { TextFileView, WorkspaceLeaf } from "obsidian";
+import { TextFileView, WorkspaceLeaf, WorkspaceItem } from "obsidian";
 import Spreadsheet from "x-data-spreadsheet";
 import * as XLSX from "xlsx";
 import { stox, xtos } from "./utils/xlsxspread";
@@ -26,16 +26,10 @@ export class ExcelView extends TextFileView {
 	setViewData(data: string, clear: boolean): void {
 		this.data = data;
 
-		this.contentEl.empty();
-
 		app.workspace.onLayoutReady(async () => {
-			this.sheetEle = this.contentEl.createDiv({
-				attr: {
-					id: "x-spreadsheet",
-					class: "sheet-box",
-				},
-			});
-
+			// 延迟 50ms，解决点击新标签时调用过早
+			await sleep(50);
+			this.sheetEle.empty();
 			const jsonData = JSON.parse(this.data || "{}") || {};
 			//@ts-ignore
 			this.sheet = new Spreadsheet(this.sheetEle, {
@@ -51,21 +45,6 @@ export class ExcelView extends TextFileView {
 				});
 
 			this.sheet.validate();
-
-			// 导入导出
-			const importInput = this.contentEl.createEl("input", {
-				cls: "import-excel",
-				type: "file",
-				attr: {
-					id: "import",
-					accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-				},
-			});
-			importInput.addEventListener(
-				"change",
-				this.handleFile.bind(this),
-				false
-			);
 		});
 	}
 
@@ -102,6 +81,7 @@ export class ExcelView extends TextFileView {
 	}
 
 	onload(): void {
+		console.log("onload");
 		const apiMissing = Boolean(
 			typeof this.containerEl.onWindowMigrated === "undefined"
 		);
@@ -115,6 +95,32 @@ export class ExcelView extends TextFileView {
 		this.exportEle = this.addAction("upload", "export xlsx file", (ev) =>
 			this.handleExportClick(ev)
 		);
+
+		app.workspace.onLayoutReady(async () => {
+			this.sheetEle = this.contentEl.createDiv({
+				attr: {
+					id: "x-spreadsheet",
+					class: "sheet-box",
+				},
+			});
+
+			// 添加导入input，用来选择导入的文件
+			const importInput = this.contentEl.createEl("input", {
+				cls: "import-excel",
+				type: "file",
+				attr: {
+					id: "import",
+					accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+				},
+			});
+			importInput.addEventListener(
+				"change",
+				this.handleFile.bind(this),
+				false
+			);
+		});
+
+		super.onload();
 	}
 
 	clear(): void {

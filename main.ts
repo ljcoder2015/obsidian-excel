@@ -1,4 +1,11 @@
-import { TFile, Plugin, WorkspaceLeaf, normalizePath } from "obsidian";
+import {
+	TFile,
+	Plugin,
+	WorkspaceLeaf,
+	normalizePath,
+	MenuItem,
+	Menu,
+} from "obsidian";
 import { ExcelSettings, DEFAULT_SETTINGS } from "./src/utils/Settings";
 import {
 	emulateCTRLClickForLinks,
@@ -12,7 +19,10 @@ import {
 	getExcelFilename,
 } from "./src/utils/FileUtils";
 
-import { getNewOrAdjacentLeaf } from "./src/utils/ObsidianUtils";
+import {
+	initializeMarkdownPostProcessor,
+	markdownPostProcessor,
+} from "./src/MarkdownPostProcessor";
 
 declare const PLUGIN_VERSION: string;
 
@@ -24,7 +34,7 @@ export default class ExcelPlugin extends Plugin {
 			VIEW_TYPE_EXCEL,
 			(leaf: WorkspaceLeaf) => new ExcelView(leaf, this)
 		);
-		this.registerExtensions(["xlsx"], VIEW_TYPE_EXCEL);
+		this.registerExtensions(["sheet"], VIEW_TYPE_EXCEL);
 
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon(
@@ -32,13 +42,80 @@ export default class ExcelPlugin extends Plugin {
 			"Excel",
 			(e: MouseEvent) => {
 				// Called when the user clicks the icon.
-				this.createAndOpenExcel(
-					getExcelFilename(this.settings)
-				);
+				this.createAndOpenExcel(getExcelFilename(this.settings));
 			}
 		);
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass("my-plugin-ribbon-class");
+
+		// TODO markdwon后处理
+		// this.addMarkdownPostProcessor();
+
+		// TODO 链接处理
+		// this.registerCommand();
+	}
+
+	private registerCommand() {
+		const fileMenuHandlerConvertKeepExtension = (
+			menu: Menu,
+			file: TFile
+		) => {
+			console.log("fileMenuHandlerConvertKeepExtension");
+			if (file instanceof TFile && file.extension == "excel") {
+				menu.addItem((item: MenuItem) => {
+					item.setTitle("*.xlsx => *.xlsx.md").onClick(() => {
+						this.convertSingleExcalidrawToMD(file, false, false);
+					});
+				});
+			}
+		};
+
+		this.registerEvent(
+			this.app.workspace.on(
+				"file-menu",
+				fileMenuHandlerConvertKeepExtension
+			)
+		);
+	}
+
+	public async convertSingleExcalidrawToMD(
+		file: TFile,
+		replaceExtension: boolean = false,
+		keepOriginal: boolean = false
+	): Promise<TFile> {
+		const data = await this.app.vault.read(file);
+		const filename =
+			file.name.substring(0, file.name.lastIndexOf(".xlsx")) +
+			(replaceExtension ? ".md" : ".xlsx.md");
+		const fname = getNewUniqueFilepath(
+			this.app.vault,
+			filename,
+			normalizePath(
+				file.path.substring(0, file.path.lastIndexOf(file.name))
+			)
+		);
+
+		const result = await this.app.vault.create(fname, "{}");
+		// if (this.settings.keepInSync) {
+		//   EXPORT_TYPES.forEach((ext: string) => {
+		// 	const oldIMGpath =
+		// 	  file.path.substring(0, file.path.lastIndexOf(".xlsx")) + ext;
+		// 	const imgFile = this.app.vault.getAbstractFileByPath(
+		// 	  normalizePath(oldIMGpath),
+		// 	);
+		// 	if (imgFile && imgFile instanceof TFile) {
+		// 	  const newIMGpath = fname.substring(0, fname.lastIndexOf(".md")) + ext;
+		// 	  this.app.fileManager.renameFile(imgFile, newIMGpath);
+		// 	}
+		//   });
+		// }
+		// if (!keepOriginal) {
+		//   this.app.vault.delete(file);
+		// }
+		return result;
+	}
+
+	private addMarkdownPostProcessor() {
+		initializeMarkdownPostProcessor(this);
+		this.registerMarkdownPostProcessor(markdownPostProcessor);
 	}
 
 	onunload() {}
@@ -116,9 +193,9 @@ export default class ExcelPlugin extends Plugin {
 
 	public isExcelFile(f: TFile) {
 		if (!f) return false;
-		if (f.extension === "xlsx") {
+		if (f.extension === "sheet") {
 			return true;
 		}
-		return false
+		return false;
 	}
 }

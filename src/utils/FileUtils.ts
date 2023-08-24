@@ -99,7 +99,7 @@ export function getExcelFilename(settings: ExcelSettings): string {
   return (
     "Excel " +
     window.moment().format('YYYY-MM-DD HH.mm.ss') +
-    ".xlsx"
+    ".sheet"
   );
 }
 
