@@ -4,7 +4,6 @@ import Spreadsheet from "x-data-spreadsheet";
 export class Excel extends MarkdownRenderChild {
 	data: string;
 	index: number;
-	sheet: Spreadsheet;
 
 	constructor(containerEl: HTMLElement, data: string, index: number) {
 		super(containerEl);
@@ -13,62 +12,74 @@ export class Excel extends MarkdownRenderChild {
 	}
 
 	onload(): void {
-		// const sheetEle = this.containerEl.createDiv({
-		// 	text: this.data,
-		// 	attr: {
-		// 		id: `x-spreadsheet-${this.index}`,
-		// 	},
-		// });
-
-		const sheetIframe = this.containerEl.createEl("iframe", {
-			cls: "sheet-iframe",
+        console.log
+		const sheetEle = this.containerEl.createDiv({
+			attr: {
+				id: `x-spreadsheet-${this.index}`,
+			},
 		});
 
-        var document = sheetIframe.contentDocument
-		if (document) {
-			// 原生插入div
-			const sheetDiv = document.createElement("div");
-			sheetDiv.id = "x-spreadsheet";
-			document.body.appendChild(sheetDiv);
+		const jsonData = JSON.parse(this.data || "{}") || {};
+		//@ts-ignore
+		const sheet = new Spreadsheet(sheetEle, {
+			mode: "read",
+			view: {
+				height: () => this.containerEl.clientHeight,
+				width: () => 300,
+			},
+		}).loadData(jsonData); // load data
 
-            // <link rel="stylesheet" href="https://unpkg.com/x-data-spreadsheet@1.1.9/dist/xspreadsheet.css">
-            // <script src="https://unpkg.com/x-data-spreadsheet@1.1.9/dist/xspreadsheet.js"></script>
+		sheet.validate();
 
-            const cssEl = document.createElement('link')
-            cssEl.rel = 'stylesheet'
-            cssEl.href = 'https://unpkg.com/x-data-spreadsheet@1.1.9/dist/xspreadsheet.css'
-            document.head.appendChild(cssEl)
+		// const sheetIframe = this.containerEl.createEl("iframe", {
+		// 	cls: "sheet-iframe",
+		// });
 
-            const scritpLinkEl = document.createElement('script')
-            scritpLinkEl.lang = 'javascript';
-            scritpLinkEl.type = 'text/javascript';
-            scritpLinkEl.text = Spreadsheet.toString()
+		// var document = sheetIframe.contentDocument
+		// if (document) {
+		// 	// 原生插入div
+		// 	const sheetDiv = document.createElement("div");
+		// 	sheetDiv.id = "x-spreadsheet";
+		// 	document.body.appendChild(sheetDiv);
 
-            document.body.appendChild(scritpLinkEl)
+		//     // <link rel="stylesheet" href="https://unpkg.com/x-data-spreadsheet@1.1.9/dist/xspreadsheet.css">
+		//     // <script src="https://unpkg.com/x-data-spreadsheet@1.1.9/dist/xspreadsheet.js"></script>
 
-            console.log(scritpLinkEl, '-----')
+		//     const cssEl = document.createElement('link')
+		//     cssEl.rel = 'stylesheet'
+		//     cssEl.href = 'https://unpkg.com/x-data-spreadsheet@1.1.9/dist/xspreadsheet.css'
+		//     document.head.appendChild(cssEl)
 
-			const scriptString = `
-                const s = x_spreadsheet("#x-spreadsheet", {
-                    mode: "read",
-                    view: {
-                        height: () => ${this.containerEl.clientHeight},
-                        width: () => 300,
-                    },
-                }).loadData(${this.data});
+		//     const scritpLinkEl = document.createElement('script')
+		//     scritpLinkEl.lang = 'javascript';
+		//     scritpLinkEl.type = 'text/javascript';
+		//     scritpLinkEl.text = Spreadsheet.toString()
 
-                s.validate();
-            `;
+		//     document.body.appendChild(scritpLinkEl)
 
-			const sEl = document.createElement("script");
-			sEl.text = scriptString;
-			document.body.appendChild(sEl);
-		}
+		//     console.log(scritpLinkEl, '-----')
 
-        console.log(
-            "sheetIframe",
-            sheetIframe
-        );
+		// 	const scriptString = `
+		//         const s = x_spreadsheet("#x-spreadsheet", {
+		//             mode: "read",
+		//             view: {
+		//                 height: () => ${this.containerEl.clientHeight},
+		//                 width: () => 300,
+		//             },
+		//         }).loadData(${this.data});
+
+		//         s.validate();
+		//     `;
+
+		// 	const sEl = document.createElement("script");
+		// 	sEl.text = scriptString;
+		// 	document.body.appendChild(sEl);
+		// }
+
+		// console.log(
+		//     "sheetIframe",
+		//     sheetIframe
+		// );
 
 		// this.containerEl.replaceWith(sheetIframe);
 	}
