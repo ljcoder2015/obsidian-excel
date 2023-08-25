@@ -1,5 +1,5 @@
 import ExcelPlugin from "main";
-import { TextFileView, WorkspaceLeaf, WorkspaceItem } from "obsidian";
+import { TextFileView, WorkspaceLeaf, Platform } from "obsidian";
 import Spreadsheet from "x-data-spreadsheet";
 import * as XLSX from "xlsx";
 import { stox, xtos } from "./utils/xlsxspread";
@@ -135,7 +135,9 @@ export class ExcelView extends TextFileView {
 	}
 
 	onResize() {
-		this.refresh();
+		if (Platform.isDesktopApp) {
+			this.refresh();
+		}
 		// console.log('resize')
 		super.onResize()
 	}
