@@ -129,7 +129,10 @@ export class ExcelView extends TextFileView {
 			.change((data) => {
 				// save data to db
 				this.data = JSON.stringify(data);
-			});
+			})
+			.on('cells-selected', (cell, { sri, sci, eri, eci}) => {
+				console.log(cell, sri, sci, eri, eci)
+			})
 
 		this.sheet.validate();
 	}

@@ -47,7 +47,7 @@ export default class ExcelPlugin extends Plugin {
 		);
 
 		// TODO markdwon后处理
-		// this.addMarkdownPostProcessor();
+		this.addMarkdownPostProcessor();
 
 		// TODO 链接处理
 		// this.registerCommand();

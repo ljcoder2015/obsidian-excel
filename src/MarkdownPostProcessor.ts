@@ -5,16 +5,7 @@ import {
   Vault,
 } from "obsidian";
 import ExcelPlugin from "../main";
-import {getIMGFilename,} from "./utils/FileUtils";
-import { linkClickModifierType } from "./utils/ModifierkeyHelper";
-
-interface imgElementAttributes {
-  file?: TFile;
-  fname: string; //Excalidraw filename
-  fwidth: string; //Display width of image
-  fheight: string; //Display height of image
-  style: string; //css style to apply to IMG element
-}
+import { Excel } from "./Excel";
 
 let plugin: ExcelPlugin;
 let vault: Vault;
@@ -40,24 +31,47 @@ export const markdownPostProcessor = async (
   ctx: MarkdownPostProcessorContext,
 ) => {
 
-  console.log(metadataCache)
+  console.log('markdownPostProcessor', el)
   //check to see if we are rendering in editing mode or live preview
   //if yes, then there should be no .internal-embed containers
   const embeddedItems = el.querySelectorAll(".internal-embed");
   if (embeddedItems.length === 0) {
-    // tmpObsidianWYSIWYG(el, ctx);
     return;
   }
 
-  //If the file being processed is an excalidraw file,
-  //then I want to hide all embedded items as these will be
-  //transcluded text element or some other transcluded content inside the Excalidraw file
-  //in reading mode these elements should be hidden
-  const excalidrawFile = Boolean(ctx.frontmatter?.hasOwnProperty("excel-plugin"));
-  if (excalidrawFile) {
-    el.style.display = "none";
-    return;
-  }
+  await processReadingMode(embeddedItems, ctx);
+};
 
-  // await processReadingMode(embeddedItems, ctx);
+const processReadingMode = async (
+  embeddedItems: NodeListOf<Element> | [HTMLElement],
+  ctx: MarkdownPostProcessorContext,
+) => {
+  //We are processing a non-excalidraw file in reading mode
+  //Embedded files will be displayed in an .internal-embed container
+
+  //Iterating all the containers in the file to check which one is an excalidraw drawing
+  //This is a for loop instead of embeddedItems.forEach() because processInternalEmbed at the end
+  //is awaited, otherwise excalidraw images would not display in the Kanban plugin
+  embeddedItems.forEach(async (maybeDrawing, index) => {
+    //check to see if the file in the src attribute exists
+    console.log(maybeDrawing)
+    const fname = maybeDrawing.getAttribute("src")?.split("#")[0];
+    if(!fname) return true;
+
+    const file = metadataCache.getFirstLinkpathDest(fname, ctx.sourcePath);
+    console.log('forEach', file, ctx.sourcePath)
+
+    //if the embeddedFile exits and it is an Excalidraw file
+    //then lets replace the .internal-embed with the generated PNG or SVG image
+    if (file && file instanceof TFile && plugin.isExcelFile(file)) {
+
+      const data = await vault.read(file)
+      const parent = maybeDrawing.parentElement
+      if (data && parent) {
+        const excel = new Excel(maybeDrawing.parentElement, data, index)
+        ctx.addChild(excel)
+      }
+      
+    }
+  })
 };

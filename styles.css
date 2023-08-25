@@ -5,6 +5,12 @@
 	padding: 0;
 }
 
+.sheet-iframe {
+	width: 100%;
+	height: 300px;
+	background-color: red;
+}
+
 .import-excel {
 	position: absolute;
 	right: 0;

@@ -1,0 +1,41 @@
+<html>
+	<head>
+		<link
+			rel="stylesheet"
+			href="https://unpkg.com/x-data-spreadsheet@1.1.9/dist/xspreadsheet.css"
+		/>
+		<script
+			lang="javascript"
+			type="text/javascript"
+			src="https://unpkg.com/x-data-spreadsheet@1.1.9/dist/xspreadsheet.js"
+		></script>
+	</head>
+	<body>
+		<div id="x-spreadsheet"></div>
+		<script>
+			const s = x_spreadsheet("#x-spreadsheet", {
+				mode: "read",
+				view: {
+					height: () => 343,
+					width: () => 300,
+				},
+			}).loadData({
+				name: "sheet2",
+				freeze: "A1",
+				styles: [],
+				merges: [],
+				rows: {
+					2: { cells: { 0: { text: "111" } } },
+					3: { cells: { 1: { text: "222" }, 2: { text: "11111" } } },
+					4: { cells: { 3: { text: "2222" } } },
+					len: 100,
+				},
+				cols: { len: 26 },
+				validations: [],
+				autofilter: {},
+			});
+
+			s.validate();
+		</script>
+	</body>
+</html>
