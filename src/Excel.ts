@@ -14,6 +14,7 @@ export class Excel extends MarkdownRenderChild {
 	onload(): void {
         console.log
 		const sheetEle = this.containerEl.createDiv({
+			cls: 'sheet-iframe',
 			attr: {
 				id: `x-spreadsheet-${this.index}`,
 			},
@@ -23,12 +24,15 @@ export class Excel extends MarkdownRenderChild {
 		//@ts-ignore
 		const sheet = new Spreadsheet(sheetEle, {
 			mode: "read",
+			showToolbar: false,
+			showBottomBar: false,
 			view: {
-				height: () => this.containerEl.clientHeight,
-				width: () => 300,
+				height: () => 300,
+				width: () => this.containerEl.clientWidth,
 			},
 		}).loadData(jsonData); // load data
 
+		// @ts-ignore
 		sheet.validate();
 
 		// const sheetIframe = this.containerEl.createEl("iframe", {

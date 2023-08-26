@@ -11,10 +11,6 @@ let plugin: ExcelPlugin;
 let vault: Vault;
 let metadataCache: MetadataCache;
 
-const getDefaultWidth = (plugin: ExcelPlugin): string => {
-  return "400";
-};
-
 export const initializeMarkdownPostProcessor = (p: ExcelPlugin) => {
   plugin = p;
   vault = p.app.vault;

@@ -1,5 +1,5 @@
 import ExcelPlugin from "main";
-import { TextFileView, WorkspaceLeaf, Platform } from "obsidian";
+import { TextFileView, WorkspaceLeaf, Platform, Notice } from "obsidian";
 import Spreadsheet from "x-data-spreadsheet";
 import * as XLSX from "xlsx";
 import { stox, xtos } from "./utils/xlsxspread";
@@ -9,7 +9,7 @@ export const VIEW_TYPE_EXCEL = "excel-view";
 export class ExcelView extends TextFileView {
 	public plugin: ExcelPlugin;
 	public ownerWindow: Window;
-	public sheet: any;
+	public sheet: Spreadsheet;
 	public importEle: HTMLElement;
 	public exportEle: HTMLElement;
 	public sheetEle: HTMLElement;
@@ -41,13 +41,17 @@ export class ExcelView extends TextFileView {
 	handleFile(e: Event) {
 		//@ts-ignore
 		const files = e.target?.files;
-		var f = files[0];
-		var reader = new FileReader();
-		var instance = this;
+		const f = files[0];
+		const reader = new FileReader();
+		const instance = this;
 		reader.onload = (e) => {
 			const data = e.target?.result;
 
-			instance.process_wb(XLSX.read(data));
+			if (data) {
+				instance.process_wb(XLSX.read(data));
+			} else {
+				new Notice('Read file error')
+			}
 		};
 		reader.readAsArrayBuffer(f);
 	}
@@ -58,17 +62,14 @@ export class ExcelView extends TextFileView {
 	}
 
 	handleExportClick(ev: MouseEvent) {
-		var new_wb = xtos(this.sheet.getData()) as XLSX.WorkBook;
-		var title = this.file?.basename ?? "sheet";
+		//@ts-ignore
+		const new_wb = xtos(this.sheet.getData()) as XLSX.WorkBook;
+		const title = this.file?.basename ?? "sheet";
 		/* write file and trigger a download */
 		XLSX.writeFile(new_wb, title + ".xlsx", {});
 	}
 
 	onload(): void {
-		// console.log("onload");
-		const apiMissing = Boolean(
-			typeof this.containerEl.onWindowMigrated === "undefined"
-		);
 		this.ownerWindow = this.containerEl.win;
 
 		// 添加顶部导入按钮
@@ -120,6 +121,7 @@ export class ExcelView extends TextFileView {
 		const jsonData = JSON.parse(this.data || "{}") || {};
 		//@ts-ignore
 		this.sheet = new Spreadsheet(this.sheetEle, {
+			showBottomBar: false,
 				view: {
 					height: () => this.contentEl.clientHeight,
 					width: () => this.contentEl.clientWidth,
@@ -134,6 +136,7 @@ export class ExcelView extends TextFileView {
 				console.log(cell, sri, sci, eri, eci)
 			})
 
+		// @ts-ignore
 		this.sheet.validate();
 	}
 
