@@ -5,18 +5,27 @@
 	padding: 0;
 }
 
-.sheet-iframe {
-	width: 100%;
-	height: 300px;
-	background-color: red;
-}
-
 .import-excel {
 	position: absolute;
 	right: 0;
 	bottom: 0;
 	z-index: 100;
 	opacity: 0;
+}
+
+/* Markdown 文档引入样式设置*/
+.sheet-iframe {
+	width: 100%;
+	height: 300px;
+	background-color: var(--background-primary-alt);
+}
+
+ul.x-spreadsheet-menu  {
+    margin-block-start: 0;
+}
+
+.sheet-iframe .x-spreadsheet-menu > li .x-spreadsheet-icon {
+	display: none;
 }
 
 /* node_modules/x-data-spreadsheet/src/index.less */

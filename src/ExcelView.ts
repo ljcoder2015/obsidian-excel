@@ -12,6 +12,7 @@ export class ExcelView extends TextFileView {
 	public sheet: Spreadsheet;
 	public importEle: HTMLElement;
 	public exportEle: HTMLElement;
+	public embedLinkEle: HTMLElement;
 	public sheetEle: HTMLElement;
 
 	constructor(leaf: WorkspaceLeaf, plugin: ExcelPlugin) {
@@ -41,14 +42,17 @@ export class ExcelView extends TextFileView {
 	handleFile(e: Event) {
 		//@ts-ignore
 		const files = e.target?.files;
+		if (!files) {
+			new Notice('Failed to get file')
+			return
+		}
 		const f = files[0];
 		const reader = new FileReader();
-		const instance = this;
 		reader.onload = (e) => {
 			const data = e.target?.result;
-
+			
 			if (data) {
-				instance.process_wb(XLSX.read(data));
+				this.process_wb(XLSX.read(data));
 			} else {
 				new Notice('Read file error')
 			}
@@ -58,7 +62,12 @@ export class ExcelView extends TextFileView {
 
 	process_wb(wb: XLSX.WorkBook) {
 		const sheetData = stox(wb);
-		this.sheet.loadData(sheetData);
+		if (sheetData) {
+			this.sheet.loadData(sheetData);
+			this.data = JSON.stringify(sheetData);
+		} else {
+			new Notice('Data parsing error')
+		}
 	}
 
 	handleExportClick(ev: MouseEvent) {
@@ -67,6 +76,17 @@ export class ExcelView extends TextFileView {
 		const title = this.file?.basename ?? "sheet";
 		/* write file and trigger a download */
 		XLSX.writeFile(new_wb, title + ".xlsx", {});
+	}
+
+	handleEmbedLink(e:Event) {
+		if (this.file) {
+			navigator.clipboard.writeText(
+				`![[${this.file.path}]]`,
+			);
+			new Notice('Copy embed link to clipboard')
+		} else {
+			new Notice('Copy embed link failed')
+		}
 	}
 
 	onload(): void {
@@ -81,29 +101,9 @@ export class ExcelView extends TextFileView {
 			this.handleExportClick(ev)
 		);
 
-		app.workspace.onLayoutReady(async () => {
-			this.sheetEle = this.contentEl.createDiv({
-				attr: {
-					id: "x-spreadsheet",
-					class: "sheet-box",
-				},
-			});
-
-			// 添加导入input，用来选择导入的文件
-			const importInput = this.contentEl.createEl("input", {
-				cls: "import-excel",
-				type: "file",
-				attr: {
-					id: "import",
-					accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-				},
-			});
-			importInput.addEventListener(
-				"change",
-				this.handleFile.bind(this),
-				false
-			);
-		});
+		this.embedLinkEle = this.addAction("link", "copy embed link", (ev) =>
+			this.handleEmbedLink(ev)
+		);
 
 		super.onload();
 	}
@@ -117,11 +117,34 @@ export class ExcelView extends TextFileView {
 	}
 
 	refresh() {
-		this.sheetEle.empty();
+		this.contentEl.empty();
+		this.sheetEle = this.contentEl.createDiv({
+			attr: {
+				id: "x-spreadsheet",
+				class: "sheet-box",
+			},
+		});
+
+		// 添加隐藏的导入input，用来选择导入的文件
+		const importInput = this.contentEl.createEl("input", {
+			cls: "import-excel",
+			type: "file",
+			attr: {
+				id: "import",
+				accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			},
+		});
+		importInput.addEventListener(
+			"change",
+			this.handleFile.bind(this),
+			false
+		);
+
+		// 初始化 sheet
 		const jsonData = JSON.parse(this.data || "{}") || {};
 		//@ts-ignore
 		this.sheet = new Spreadsheet(this.sheetEle, {
-			showBottomBar: false,
+			showBottomBar: true,
 				view: {
 					height: () => this.contentEl.clientHeight,
 					width: () => this.contentEl.clientWidth,
@@ -130,10 +153,8 @@ export class ExcelView extends TextFileView {
 			.loadData(jsonData) // load data
 			.change((data) => {
 				// save data to db
+				console.log('save data to db')
 				this.data = JSON.stringify(data);
-			})
-			.on('cells-selected', (cell, { sri, sci, eri, eci}) => {
-				console.log(cell, sri, sci, eri, eci)
 			})
 
 		// @ts-ignore

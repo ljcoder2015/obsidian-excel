@@ -25,7 +25,7 @@ export class Excel extends MarkdownRenderChild {
 		const sheet = new Spreadsheet(sheetEle, {
 			mode: "read",
 			showToolbar: false,
-			showBottomBar: false,
+			showBottomBar: true,
 			view: {
 				height: () => 300,
 				width: () => this.containerEl.clientWidth,
