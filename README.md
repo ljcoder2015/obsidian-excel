@@ -11,8 +11,12 @@ If you are using Microsoft Office 365 to create xlsx files, you need to import t
 
 ![import](./doc/img/import.gif)
 
+### embed link to markdown
 
-## TODO
-- link to markdown
+![link](./doc/img/link.gif)
+
+### E-mail
+
+- ljcoder@163.com
 
 

@@ -1,11 +1,10 @@
 {
 	"id": "excel",
 	"name": "Excel",
-	"version": "1.1.2",
+	"version": "1.2.1",
 	"minAppVersion": "0.15.0",
-	"description": "This is a Excel plugin for Obsidian.",
+	"description": "Create spreadsheets and easily embed them in Markdown",
 	"author": "ljcoder",
 	"authorUrl": "https://github.com/ljcoder2015",
-	"fundingUrl": "https://github.com/ljcoder2015/obsidian-excel",
 	"isDesktopOnly": false
 }

@@ -62,6 +62,7 @@ const processReadingMode = async (
     if (file && file instanceof TFile && plugin.isExcelFile(file)) {
 
       const data = await vault.read(file)
+      console.log(data)
       const parent = maybeDrawing.parentElement
       if (data && parent) {
         const excel = new Excel(maybeDrawing.parentElement, data, index)
