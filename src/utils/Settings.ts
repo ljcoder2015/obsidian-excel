@@ -1,9 +1,9 @@
 export interface ExcelSettings {
 	folder: string;
-	excelFilenamePrefix: String,
+	excelFilenamePrefix: string,
 	excelEmbedPrefixWithFilename: true,
-	excelFilnameEmbedPostfix: String,
-	excelFilenameDateTime: String,
+	excelFilnameEmbedPostfix: string,
+	excelFilenameDateTime: string,
 }
 
 export const DEFAULT_SETTINGS: ExcelSettings = {
