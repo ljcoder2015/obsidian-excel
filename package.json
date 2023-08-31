@@ -6,7 +6,8 @@
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"version": "node version-bump.mjs && git add manifest.json versions.json"
+		"version": "node version-bump.mjs && git add manifest.json versions.json",
+		"postinstall": "patch-package"
 	},
 	"keywords": [],
 	"author": "",
@@ -23,6 +24,7 @@
 		"esbuild": "0.17.3",
 		"esbuild-plugin-less": "^1.2.4",
 		"obsidian": "latest",
+		"patch-package": "^8.0.0",
 		"tslib": "2.4.0",
 		"typescript": "4.7.4"
 	},
