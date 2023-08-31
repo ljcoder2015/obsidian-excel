@@ -154,7 +154,12 @@ export class ExcelView extends TextFileView {
 			.change(() => {
 				// save data to db
 				const data = this.sheet.getData()
-				console.log('save data to db', data)
+				// console.log('save data to db', data)
+				this.data = JSON.stringify(data);
+			})
+			.onAddSheet(()=> {
+				const data = this.sheet.getData()
+				// console.log('onAddSheet', data)
 				this.data = JSON.stringify(data);
 			})
 
