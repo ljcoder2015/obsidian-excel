@@ -151,9 +151,10 @@ export class ExcelView extends TextFileView {
 				},
 			})
 			.loadData(jsonData) // load data
-			.change((data) => {
+			.change(() => {
 				// save data to db
-				console.log('save data to db')
+				const data = this.sheet.getData()
+				console.log('save data to db', data)
 				this.data = JSON.stringify(data);
 			})
 
