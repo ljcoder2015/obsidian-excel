@@ -242,12 +242,13 @@ export class ExcelView extends TextFileView {
 				html += "</tr>"
 			}
 		} else {
-			new Notice("请先选择要拷贝的数据")
+			new Notice("Please first select the data to copy")
 		}
 
 		html +="</table>"
 
 		navigator.clipboard.writeText(html);
+		new Notice("copied")
 	}
 
 	onResize() {
