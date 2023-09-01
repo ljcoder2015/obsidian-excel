@@ -13,7 +13,21 @@ export class ExcelView extends TextFileView {
 	public importEle: HTMLElement;
 	public exportEle: HTMLElement;
 	public embedLinkEle: HTMLElement;
+	public copyHTMLEle: HTMLElement;
 	public sheetEle: HTMLElement;
+	public cellsSelected: {
+		sheet: Record<string, any> | null,
+		sri: number | null, // 选中开始行 index
+		sci: number | null, // 选中开始列 index
+		eri: number | null, // 选中结束行 index
+		eci: number | null, // 选中结束列 index
+	} = {
+		sheet: null,
+		sri: null,
+		sci: null,
+		eri: null,
+		eci: null,
+	}
 
 	constructor(leaf: WorkspaceLeaf, plugin: ExcelPlugin) {
 		super(leaf);
@@ -105,6 +119,10 @@ export class ExcelView extends TextFileView {
 			this.handleEmbedLink(ev)
 		);
 
+		this.copyHTMLEle = this.addAction("file-code", "copy to HTML", (ev) =>
+			this.copyToHTML()
+		);
+
 		super.onload();
 	}
 
@@ -154,7 +172,7 @@ export class ExcelView extends TextFileView {
 			.change(() => {
 				// save data to db
 				const data = this.sheet.getData()
-				// console.log('save data to db', data)
+				console.log('save data to db', data)
 				this.data = JSON.stringify(data);
 			})
 			.onAddSheet(()=> {
@@ -162,9 +180,76 @@ export class ExcelView extends TextFileView {
 				// console.log('onAddSheet', data)
 				this.data = JSON.stringify(data);
 			})
+			.onRenameSheet(()=> {
+				const data = this.sheet.getData()
+				// console.log('onRenameSheet', data)
+				this.data = JSON.stringify(data);
+			})
+			
+		this.sheet.on('cells-selected', (sheetData, {sri, sci, eri, eci}) => {
+			// console.log('cells-selected',sheetData, sri, sci, eri, eci)
+			this.cellsSelected.sheet = sheetData
+			this.cellsSelected.sri = sri
+			this.cellsSelected.sci = sci
+			this.cellsSelected.eri = eri
+			this.cellsSelected.eci = eci
+			
+		})
+		
+		this.sheet.on('cell-selected', (sheetData, ri, ci) => {
+			// console.log('cell-selected',sheetData, ri, ci)
+			this.cellsSelected.sheet = sheetData
+			this.cellsSelected.sri = ri
+			this.cellsSelected.sci = ci
+			this.cellsSelected.eri = ri
+			this.cellsSelected.eci = ci
+		})
 
 		// @ts-ignore
 		this.sheet.validate();
+	}
+
+	copyToHTML() {
+		const data = this.cellsSelected.sheet
+		const sri = this.cellsSelected.sri
+		const sci = this.cellsSelected.sci
+		const eri = this.cellsSelected.eri
+		const eci = this.cellsSelected.eci
+
+		console.log('data', data, sri, sci, eri, eci)
+
+		var html = "<table>"
+
+		if (data && sri && sci && eri && eci) {
+			for (var row = sri; row <= eri; row ++) {
+				html += "<tr>"
+				const cells = data.rows._[`${row}`]
+				console.log('cells', row, cells.cells)
+				if (cells) {
+					for (var col = sci; col <= eci; col ++ ) {
+						const cell = cells.cells[`${col}`]
+						console.log('cell', row, col, cell)
+						if (cell) {
+							if (cell.merge) {
+								html += `<td rowspan="${cell.merge[0]}" colspan="${cell.merge[1]}">${cell.text}</td>`
+							} else {
+								html += `<td>${cell.text}</td>`
+							}
+						} else {
+							html += "<td></td>"
+						}
+					}
+				}
+				
+				html += "</tr>"
+			}
+		} else {
+			new Notice("请先选择要拷贝的数据")
+		}
+
+		html +="</table>"
+
+		navigator.clipboard.writeText(html);
 	}
 
 	onResize() {

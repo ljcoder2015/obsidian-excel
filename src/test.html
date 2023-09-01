@@ -11,31 +11,6 @@
 		></script>
 	</head>
 	<body>
-		<div id="x-spreadsheet"></div>
-		<script>
-			const s = x_spreadsheet("#x-spreadsheet", {
-				mode: "read",
-				view: {
-					height: () => 343,
-					width: () => 300,
-				},
-			}).loadData({
-				name: "sheet2",
-				freeze: "A1",
-				styles: [],
-				merges: [],
-				rows: {
-					2: { cells: { 0: { text: "111" } } },
-					3: { cells: { 1: { text: "222" }, 2: { text: "11111" } } },
-					4: { cells: { 3: { text: "2222" } } },
-					len: 100,
-				},
-				cols: { len: 26 },
-				validations: [],
-				autofilter: {},
-			});
-
-			s.validate();
-		</script>
+		<table border="1"><tr><td rowspan="0" colspan="1">223</td><td></td></tr><tr><td>224dldlld</td><td></td></tr><tr><td></td><td></td></tr></table>
 	</body>
 </html>
