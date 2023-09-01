@@ -235,8 +235,6 @@ export class ExcelView extends TextFileView {
 							} else {
 								html += `<td>${cell.text}</td>`
 							}
-						} else {
-							html += "<td></td>"
 						}
 					}
 				}
