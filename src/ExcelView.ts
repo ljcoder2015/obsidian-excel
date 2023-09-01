@@ -216,7 +216,7 @@ export class ExcelView extends TextFileView {
 		const eri = this.cellsSelected.eri
 		const eci = this.cellsSelected.eci
 
-		console.log('data', data, sri, sci, eri, eci)
+		// console.log('data', data, sri, sci, eri, eci)
 
 		var html = "<table>"
 
@@ -224,11 +224,11 @@ export class ExcelView extends TextFileView {
 			for (var row = sri; row <= eri; row ++) {
 				html += "<tr>"
 				const cells = data.rows._[`${row}`]
-				console.log('cells', row, cells.cells)
+				// console.log('cells', row, cells.cells)
 				if (cells) {
 					for (var col = sci; col <= eci; col ++ ) {
 						const cell = cells.cells[`${col}`]
-						console.log('cell', row, col, cell)
+						// console.log('cell', row, col, cell)
 						if (cell) {
 							if (cell.merge) {
 								html += `<td rowspan="${cell.merge[0]}" colspan="${cell.merge[1]}">${cell.text}</td>`
