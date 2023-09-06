@@ -137,9 +137,9 @@ export class ExcelView extends TextFileView {
 			this.handleExportClick(ev)
 		);
 
-		this.embedLinkEle = this.addAction("link", "copy embed link", (ev) =>
-			this.handleEmbedLink(ev)
-		);
+		// this.embedLinkEle = this.addAction("link", "copy embed link", (ev) =>
+		// 	this.handleEmbedLink(ev)
+		// );
 
 		this.copyHTMLEle = this.addAction("file-code", "copy to HTML", (ev) =>
 			this.copyToHTML()
