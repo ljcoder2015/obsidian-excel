@@ -1,4 +1,4 @@
-import ExcelPlugin from "main";
+import ExcelPlugin from "src/main";
 import { WorkspaceLeaf } from "obsidian";
 
 const getLeafLoc = (

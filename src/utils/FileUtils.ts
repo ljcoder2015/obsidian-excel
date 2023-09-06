@@ -79,8 +79,8 @@ export function getNewUniqueFilepath(
   let fname = normalizePath(`${folderpath}/${filename}`);
   let file: TAbstractFile | null = vault.getAbstractFileByPath(fname);
   let i = 0;
-  const extension = filename.endsWith(".xlsx.md")
-    ? ".xlsx.md"
+  const extension = filename.endsWith(".sheet.md")
+    ? ".sheet.md"
     : filename.slice(filename.lastIndexOf("."));
   while (file) {
     fname = normalizePath(
@@ -99,7 +99,7 @@ export function getExcelFilename(settings: ExcelSettings): string {
   return (
     "Excel " +
     window.moment().format('YYYY-MM-DD HH.mm.ss') +
-    ".sheet"
+    ".sheet.md"
   );
 }
 

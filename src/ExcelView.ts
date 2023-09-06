@@ -1,10 +1,9 @@
-import ExcelPlugin from "main";
+import ExcelPlugin from "src/main";
 import { TextFileView, WorkspaceLeaf, Platform, Notice } from "obsidian";
 import Spreadsheet from "x-data-spreadsheet";
 import * as XLSX from "xlsx";
 import { stox, xtos } from "./utils/xlsxspread";
-
-export const VIEW_TYPE_EXCEL = "excel-view";
+import { VIEW_TYPE_EXCEL, FRONTMATTER } from "./constants";
 
 export class ExcelView extends TextFileView {
 	public plugin: ExcelPlugin;
@@ -16,18 +15,18 @@ export class ExcelView extends TextFileView {
 	public copyHTMLEle: HTMLElement;
 	public sheetEle: HTMLElement;
 	public cellsSelected: {
-		sheet: Record<string, any> | null,
-		sri: number | null, // 选中开始行 index
-		sci: number | null, // 选中开始列 index
-		eri: number | null, // 选中结束行 index
-		eci: number | null, // 选中结束列 index
+		sheet: Record<string, any> | null;
+		sri: number | null; // 选中开始行 index
+		sci: number | null; // 选中开始列 index
+		eri: number | null; // 选中结束行 index
+		eci: number | null; // 选中结束列 index
 	} = {
 		sheet: null,
 		sri: null,
 		sci: null,
 		eri: null,
 		eci: null,
-	}
+	};
 
 	constructor(leaf: WorkspaceLeaf, plugin: ExcelPlugin) {
 		super(leaf);
@@ -36,6 +35,31 @@ export class ExcelView extends TextFileView {
 
 	getViewData(): string {
 		return this.data;
+	}
+
+	getExcelData(): string {
+		const tagText = "# Excel\n";
+		const trimLocation = this.data.search(tagText);
+		if (trimLocation == -1) return this.data;
+		const excelData = this.data.substring(
+			trimLocation + tagText.length,
+			this.data.length
+		);
+		// console.log("trimLocation", trimLocation, excelData, this.data);
+		return excelData;
+	}
+
+	headerData() {
+		return FRONTMATTER + "\n# Excel\n";
+	}
+
+	saveData(data: string) {
+		this.data = this.headerData() + data;
+		// console.log("saveData", this.data)
+	}
+
+	clear(): void {
+		this.data = this.headerData();
 	}
 
 	setViewData(data: string, clear: boolean): void {
@@ -57,18 +81,18 @@ export class ExcelView extends TextFileView {
 		//@ts-ignore
 		const files = e.target?.files;
 		if (!files) {
-			new Notice('Failed to get file')
-			return
+			new Notice("Failed to get file");
+			return;
 		}
 		const f = files[0];
 		const reader = new FileReader();
 		reader.onload = (e) => {
 			const data = e.target?.result;
-			
+
 			if (data) {
 				this.process_wb(XLSX.read(data));
 			} else {
-				new Notice('Read file error')
+				new Notice("Read file error");
 			}
 		};
 		reader.readAsArrayBuffer(f);
@@ -80,7 +104,7 @@ export class ExcelView extends TextFileView {
 			this.sheet.loadData(sheetData);
 			this.data = JSON.stringify(sheetData);
 		} else {
-			new Notice('Data parsing error')
+			new Notice("Data parsing error");
 		}
 	}
 
@@ -92,14 +116,12 @@ export class ExcelView extends TextFileView {
 		XLSX.writeFile(new_wb, title + ".xlsx", {});
 	}
 
-	handleEmbedLink(e:Event) {
+	handleEmbedLink(e: Event) {
 		if (this.file) {
-			navigator.clipboard.writeText(
-				`![[${this.file.path}]]`,
-			);
-			new Notice('Copy embed link to clipboard')
+			navigator.clipboard.writeText(`![[${this.file.path}]]`);
+			new Notice("Copy embed link to clipboard");
 		} else {
-			new Notice('Copy embed link failed')
+			new Notice("Copy embed link failed");
 		}
 	}
 
@@ -126,9 +148,7 @@ export class ExcelView extends TextFileView {
 		super.onload();
 	}
 
-	clear(): void {
-		this.data = "";
-	}
+	
 
 	getViewType(): string {
 		return VIEW_TYPE_EXCEL;
@@ -159,96 +179,96 @@ export class ExcelView extends TextFileView {
 		);
 
 		// 初始化 sheet
-		const jsonData = JSON.parse(this.data || "{}") || {};
+		const jsonData = JSON.parse(this.getExcelData() || "{}") || {};
+
 		//@ts-ignore
 		this.sheet = new Spreadsheet(this.sheetEle, {
 			showBottomBar: true,
-				view: {
-					height: () => this.contentEl.clientHeight,
-					width: () => this.contentEl.clientWidth,
-				},
-			})
+			view: {
+				height: () => this.contentEl.clientHeight,
+				width: () => this.contentEl.clientWidth,
+			},
+		})
 			.loadData(jsonData) // load data
 			.change(() => {
 				// save data to db
-				const data = this.sheet.getData()
-				console.log('save data to db', data)
-				this.data = JSON.stringify(data);
+				const data = this.sheet.getData();
+				// console.log("save data to db", data);
+				this.saveData(JSON.stringify(data))
 			})
-			.onAddSheet(()=> {
-				const data = this.sheet.getData()
+			.onAddSheet(() => {
+				const data = this.sheet.getData();
 				// console.log('onAddSheet', data)
-				this.data = JSON.stringify(data);
+				this.saveData(JSON.stringify(data))
 			})
-			.onRenameSheet(()=> {
-				const data = this.sheet.getData()
+			.onRenameSheet(() => {
+				const data = this.sheet.getData();
 				// console.log('onRenameSheet', data)
-				this.data = JSON.stringify(data);
-			})
-			
-		this.sheet.on('cells-selected', (sheetData, {sri, sci, eri, eci}) => {
+				this.saveData(JSON.stringify(data))
+			});
+
+		this.sheet.on("cells-selected", (sheetData, { sri, sci, eri, eci }) => {
 			// console.log('cells-selected',sheetData, sri, sci, eri, eci)
-			this.cellsSelected.sheet = sheetData
-			this.cellsSelected.sri = sri
-			this.cellsSelected.sci = sci
-			this.cellsSelected.eri = eri
-			this.cellsSelected.eci = eci
-			
-		})
-		
-		this.sheet.on('cell-selected', (sheetData, ri, ci) => {
+			this.cellsSelected.sheet = sheetData;
+			this.cellsSelected.sri = sri;
+			this.cellsSelected.sci = sci;
+			this.cellsSelected.eri = eri;
+			this.cellsSelected.eci = eci;
+		});
+
+		this.sheet.on("cell-selected", (sheetData, ri, ci) => {
 			// console.log('cell-selected',sheetData, ri, ci)
-			this.cellsSelected.sheet = sheetData
-			this.cellsSelected.sri = ri
-			this.cellsSelected.sci = ci
-			this.cellsSelected.eri = ri
-			this.cellsSelected.eci = ci
-		})
+			this.cellsSelected.sheet = sheetData;
+			this.cellsSelected.sri = ri;
+			this.cellsSelected.sci = ci;
+			this.cellsSelected.eri = ri;
+			this.cellsSelected.eci = ci;
+		});
 
 		// @ts-ignore
 		this.sheet.validate();
 	}
 
 	copyToHTML() {
-		const data = this.cellsSelected.sheet
-		const sri = this.cellsSelected.sri
-		const sci = this.cellsSelected.sci
-		const eri = this.cellsSelected.eri
-		const eci = this.cellsSelected.eci
+		const data = this.cellsSelected.sheet;
+		const sri = this.cellsSelected.sri;
+		const sci = this.cellsSelected.sci;
+		const eri = this.cellsSelected.eri;
+		const eci = this.cellsSelected.eci;
 
 		// console.log('data', data, sri, sci, eri, eci)
 
-		var html = "<table>"
+		var html = "<table>";
 
 		if (data && sri && sci && eri && eci) {
-			for (var row = sri; row <= eri; row ++) {
-				html += "<tr>"
-				const cells = data.rows._[`${row}`]
+			for (var row = sri; row <= eri; row++) {
+				html += "<tr>";
+				const cells = data.rows._[`${row}`];
 				// console.log('cells', row, cells.cells)
 				if (cells) {
-					for (var col = sci; col <= eci; col ++ ) {
-						const cell = cells.cells[`${col}`]
+					for (var col = sci; col <= eci; col++) {
+						const cell = cells.cells[`${col}`];
 						// console.log('cell', row, col, cell)
 						if (cell) {
 							if (cell.merge) {
-								html += `<td rowspan="${cell.merge[0]}" colspan="${cell.merge[1]}">${cell.text}</td>`
+								html += `<td rowspan="${cell.merge[0]}" colspan="${cell.merge[1]}">${cell.text}</td>`;
 							} else {
-								html += `<td>${cell.text}</td>`
+								html += `<td>${cell.text}</td>`;
 							}
 						}
 					}
 				}
-				
-				html += "</tr>"
+
+				html += "</tr>";
 			}
 		} else {
-			new Notice("Please first select the data to copy")
+			new Notice("Please first select the data to copy");
 		}
 
-		html +="</table>"
+		html += "</table>";
 
 		navigator.clipboard.writeText(html);
-		new Notice("copied")
+		new Notice("copied");
 	}
 
 	onResize() {
@@ -256,6 +276,6 @@ export class ExcelView extends TextFileView {
 			this.refresh();
 		}
 		// console.log('resize')
-		super.onResize()
+		super.onResize();
 	}
 }

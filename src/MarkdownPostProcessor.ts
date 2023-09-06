@@ -4,8 +4,8 @@ import {
 	TFile,
 	Vault,
 } from "obsidian";
-import ExcelPlugin from "../main";
-import { Excel } from "./Excel";
+import ExcelPlugin from "./main";
+import Spreadsheet from "x-data-spreadsheet";
 
 let plugin: ExcelPlugin;
 let vault: Vault;
@@ -23,7 +23,7 @@ const tmpObsidianWYSIWYG = async (
 	ctx: MarkdownPostProcessorContext
 ) => {
 	const file = plugin.app.vault.getAbstractFileByPath(ctx.sourcePath);
-  console.log('tmpObsidianWYSIWYG',file, el, ctx.sourcePath)
+	console.log("tmpObsidianWYSIWYG");
 	if (!(file instanceof TFile)) return;
 	if (!plugin.isExcelFile(file)) return;
 
@@ -72,19 +72,81 @@ const tmpObsidianWYSIWYG = async (
 		//the excalidraw file in markdown preview mode
 		const isFrontmatterDiv = Boolean(el.querySelector(".frontmatter"));
 		el.empty();
-
+		if (!isFrontmatterDiv) {
+			if (el.parentElement === containerEl) containerEl.removeChild(el);
+			return;
+		}
 		internalEmbedDiv.empty();
 		const data = await vault.read(file);
-		const excel = new Excel(el, data, new Date().getTime());
-		ctx.addChild(excel);
+		const sheetDiv = createSheetEl(
+			getExcelData(data),
+			internalEmbedDiv.clientWidth
+		);
+		if (markdownEmbed) {
+			//display image on canvas without markdown frame
+			internalEmbedDiv.removeClass("markdown-embed");
+			internalEmbedDiv.removeClass("inline-embed");
+		}
+		internalEmbedDiv.appendChild(sheetDiv);
+		// console.log('internalEmbedDiv', internalEmbedDiv, markdownEmbed)
 	}
 
 	el.empty();
 
+	if (internalEmbedDiv.hasAttribute("ready")) {
+		return;
+	}
+	internalEmbedDiv.setAttribute("ready", "");
+
 	internalEmbedDiv.empty();
 	const data = await vault.read(file);
-	const excel = new Excel(el, data, 0);
-	ctx.addChild(excel);
+	const sheetDiv = createSheetEl(
+		getExcelData(data),
+		internalEmbedDiv.clientWidth
+	);
+	if (markdownEmbed) {
+		//display image on canvas without markdown frame
+		internalEmbedDiv.removeClass("markdown-embed");
+		internalEmbedDiv.removeClass("inline-embed");
+	}
+	internalEmbedDiv.appendChild(sheetDiv);
+};
+
+const createSheetEl = (data: string, width: number): HTMLDivElement => {
+	const sheetEle = createDiv({
+		cls: "sheet-iframe",
+		attr: {
+			id: `x-spreadsheet-${new Date().getTime()}`,
+		},
+	});
+
+	const jsonData = JSON.parse(data || "{}") || {};
+	//@ts-ignore
+	const sheet = new Spreadsheet(sheetEle, {
+		mode: "read",
+		showToolbar: false,
+		showBottomBar: true,
+		view: {
+			height: () => 300,
+			width: () => width,
+		},
+	}).loadData(jsonData); // load data
+
+	// @ts-ignore
+	sheet.validate();
+	return sheetEle;
+};
+
+const getExcelData = (data: string): string => {
+	const tagText = "# Excel\n";
+	const trimLocation = data.search(tagText);
+	if (trimLocation == -1) return data;
+	const excelData = data.substring(
+		trimLocation + tagText.length,
+		data.length
+	);
+	// console.log("trimLocation", trimLocation, excelData, this.data);
+	return excelData;
 };
 
 /**
@@ -99,7 +161,9 @@ export const markdownPostProcessor = async (
 	//check to see if we are rendering in editing mode or live preview
 	//if yes, then there should be no .internal-embed containers
 	const embeddedItems = el.querySelectorAll(".internal-embed");
+	console.log("markdownPostProcessor", embeddedItems.length);
 	if (embeddedItems.length === 0) {
+		tmpObsidianWYSIWYG(el, ctx);
 		return;
 	}
 
@@ -110,6 +174,7 @@ const processReadingMode = async (
 	embeddedItems: NodeListOf<Element> | [HTMLElement],
 	ctx: MarkdownPostProcessorContext
 ) => {
+	console.log("processReadingMode");
 	//We are processing a non-excalidraw file in reading mode
 	//Embedded files will be displayed in an .internal-embed container
 
@@ -123,21 +188,31 @@ const processReadingMode = async (
 		if (!fname) return true;
 
 		const file = metadataCache.getFirstLinkpathDest(fname, ctx.sourcePath);
-		console.log("forEach", file, ctx.sourcePath);
+		// console.log("forEach", file, ctx.sourcePath);
 
 		//if the embeddedFile exits and it is an Excalidraw file
 		//then lets replace the .internal-embed with the generated PNG or SVG image
 		if (file && file instanceof TFile && plugin.isExcelFile(file)) {
-			const data = await vault.read(file);
-			const parent = maybeDrawing.parentElement;
-			if (data && parent) {
-				const excel = new Excel(
-					maybeDrawing.parentElement,
-					data,
-					index
-				);
-				ctx.addChild(excel);
-			}
+
+			maybeDrawing.parentElement?.replaceChild(
+				await processInternalEmbed(maybeDrawing,file),
+				maybeDrawing
+			  );
 		}
 	});
 };
+
+const processInternalEmbed = async (internalEmbedEl: Element, file: TFile ):Promise<HTMLDivElement> => {
+
+	const src = internalEmbedEl.getAttribute("src");
+	//@ts-ignore
+	if (!src) return;
+  
+	//https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/1059
+	internalEmbedEl.removeClass("markdown-embed");
+	internalEmbedEl.removeClass("inline-embed");
+
+	const data = await vault.read(file);
+
+	return await createSheetEl(getExcelData(data), internalEmbedEl.clientWidth);
+  }
