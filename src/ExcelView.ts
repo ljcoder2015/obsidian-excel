@@ -102,7 +102,7 @@ export class ExcelView extends TextFileView {
 		const sheetData = stox(wb);
 		if (sheetData) {
 			this.sheet.loadData(sheetData);
-			this.data = JSON.stringify(sheetData);
+			this.saveData(JSON.stringify(sheetData));
 		} else {
 			new Notice("Data parsing error");
 		}
