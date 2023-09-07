@@ -79,7 +79,7 @@ export default class ExcelPlugin extends Plugin {
 		this.app.workspace.onLayoutReady(() => {
 			let leaf: WorkspaceLeaf;
 			let markdownLeaf = this.app.workspace.getLeavesOfType("markdown")
-			console.log("switchToExcelAfterLoad", markdownLeaf);
+			// console.log("switchToExcelAfterLoad", markdownLeaf);
 			for (leaf of markdownLeaf) {
 				if (
 					leaf.view instanceof MarkdownView &&
@@ -113,7 +113,7 @@ export default class ExcelPlugin extends Plugin {
 		this.register(
 			around(Workspace.prototype, {
 				getActiveViewOfType(old) {
-					console.log("Workspace.prototype", old);
+					// console.log("Workspace.prototype", old);
 					return dedupe(key, old, function (...args) {
 						const result = old && old.apply(this, args);
 						const maybeSheetView =
@@ -133,7 +133,7 @@ export default class ExcelPlugin extends Plugin {
 				//stolen from hover editor
 				around(WorkspaceLeaf.prototype, {
 					getRoot(old) {
-						console.log("stolen from hover editor");
+						// console.log("stolen from hover editor");
 						return function () {
 							const top = old.call(this);
 							return top.getRoot === this.getRoot
@@ -202,7 +202,7 @@ export default class ExcelPlugin extends Plugin {
 				detach(next) {
 					return function () {
 						const state = this.view?.getState();
-						console.log('state--', state.file)
+						// console.log('state--', state.file)
 						if (
 							state?.file &&
 							self.excelFileModes[this.id || state.file]

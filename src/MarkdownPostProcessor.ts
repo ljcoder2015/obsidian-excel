@@ -24,7 +24,7 @@ const tmpObsidianWYSIWYG = async (
 	ctx: MarkdownPostProcessorContext
 ) => {
 	const file = plugin.app.vault.getAbstractFileByPath(ctx.sourcePath);
-	console.log("tmpObsidianWYSIWYG");
+	// console.log("tmpObsidianWYSIWYG");
 	if (!(file instanceof TFile)) return;
 	if (!plugin.isExcelFile(file)) return;
 
@@ -194,7 +194,7 @@ const processReadingMode = async (
 	//is awaited, otherwise excalidraw images would not display in the Kanban plugin
 	embeddedItems.forEach(async (maybeDrawing, index) => {
 		//check to see if the file in the src attribute exists
-		console.log(maybeDrawing);
+		// console.log(maybeDrawing);
 		const fname = maybeDrawing.getAttribute("src")?.split("#")[0];
 		if (!fname) return true;
 

@@ -74,7 +74,7 @@ export const getExcelAreaData = (
 									rowLen,
 									eri - sri + 1 + cell.merge[0]
 								);
-								console.log(rowLen);
+								// console.log(rowLen);
 							}
 						}
 					}
