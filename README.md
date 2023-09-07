@@ -15,6 +15,8 @@ If you are using Microsoft Office 365 to create xlsx files, you need to import t
 
 ![link](./doc/img/link.gif)
 
+![link](./doc/img/part-link.gif)
+
 ### copy selected cells to HTML
 
 ![html](./doc/img/html.gif)
