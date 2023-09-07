@@ -4,6 +4,7 @@ import Spreadsheet from "x-data-spreadsheet";
 import * as XLSX from "xlsx";
 import { stox, xtos } from "./utils/xlsxspread";
 import { VIEW_TYPE_EXCEL, FRONTMATTER } from "./constants";
+import { getExcelData } from "./utils/DataUtils";
 
 export class ExcelView extends TextFileView {
 	public plugin: ExcelPlugin;
@@ -35,18 +36,6 @@ export class ExcelView extends TextFileView {
 
 	getViewData(): string {
 		return this.data;
-	}
-
-	getExcelData(): string {
-		const tagText = "# Excel\n";
-		const trimLocation = this.data.search(tagText);
-		if (trimLocation == -1) return this.data;
-		const excelData = this.data.substring(
-			trimLocation + tagText.length,
-			this.data.length
-		);
-		// console.log("trimLocation", trimLocation, excelData, this.data);
-		return excelData;
 	}
 
 	headerData() {
@@ -117,8 +106,18 @@ export class ExcelView extends TextFileView {
 	}
 
 	handleEmbedLink(e: Event) {
-		if (this.file) {
-			navigator.clipboard.writeText(`![[${this.file.path}]]`);
+		const data = this.cellsSelected.sheet;
+		const sri = this.cellsSelected.sri;
+		const sci = this.cellsSelected.sci;
+		const eri = this.cellsSelected.eri;
+		const eci = this.cellsSelected.eci;
+
+		
+		// 格式 sri-sci:eri-eci
+		if (this.file && data && sri && sci && eri && eci) {
+			const link = `![[${this.file.basename}#${data.name}|${sri}-${sci}:${eri}-${eci}]]`
+			console.log(this.file, link)
+			navigator.clipboard.writeText(link);
 			new Notice("Copy embed link to clipboard");
 		} else {
 			new Notice("Copy embed link failed");
@@ -137,9 +136,9 @@ export class ExcelView extends TextFileView {
 			this.handleExportClick(ev)
 		);
 
-		// this.embedLinkEle = this.addAction("link", "copy embed link", (ev) =>
-		// 	this.handleEmbedLink(ev)
-		// );
+		this.embedLinkEle = this.addAction("link", "copy embed link", (ev) =>
+			this.handleEmbedLink(ev)
+		);
 
 		this.copyHTMLEle = this.addAction("file-code", "copy to HTML", (ev) =>
 			this.copyToHTML()
@@ -179,7 +178,7 @@ export class ExcelView extends TextFileView {
 		);
 
 		// 初始化 sheet
-		const jsonData = JSON.parse(this.getExcelData() || "{}") || {};
+		const jsonData = JSON.parse(getExcelData(this.data) || "{}") || {};
 
 		//@ts-ignore
 		this.sheet = new Spreadsheet(this.sheetEle, {

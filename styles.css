@@ -16,8 +16,9 @@
 /* Markdown 文档引入样式设置*/
 .sheet-iframe {
 	width: 100%;
-	height: 300px;
+	height: 308px;
 	background-color: var(--background-primary-alt);
+	border: 5px solid #f5f6f7;
 }
 
 ul.x-spreadsheet-menu  {

@@ -6,6 +6,7 @@ import {
 } from "obsidian";
 import ExcelPlugin from "./main";
 import Spreadsheet from "x-data-spreadsheet";
+import { getExcelData, getExcelAreaData } from "./utils/DataUtils";
 
 let plugin: ExcelPlugin;
 let vault: Vault;
@@ -100,8 +101,17 @@ const tmpObsidianWYSIWYG = async (
 
 	internalEmbedDiv.empty();
 	const data = await vault.read(file);
+	
+	const src = internalEmbedDiv.getAttribute("src") ?? ""
+	const alt = internalEmbedDiv.getAttribute("alt") ?? ""
+	const split = src.split("#")
+	var excelData = getExcelData(data)
+	if (split.length > 1) {
+		excelData = getExcelAreaData(data, split[1], alt, internalEmbedDiv.clientWidth)
+	}
+	console.log('internalEmbedDiv', excelData, src, alt)
 	const sheetDiv = createSheetEl(
-		getExcelData(data),
+		excelData,
 		internalEmbedDiv.clientWidth
 	);
 	if (markdownEmbed) {
@@ -121,6 +131,7 @@ const createSheetEl = (data: string, width: number): HTMLDivElement => {
 	});
 
 	const jsonData = JSON.parse(data || "{}") || {};
+	// console.log("createSheetEl", jsonData, data)
 	//@ts-ignore
 	const sheet = new Spreadsheet(sheetEle, {
 		mode: "read",
@@ -137,18 +148,6 @@ const createSheetEl = (data: string, width: number): HTMLDivElement => {
 	return sheetEle;
 };
 
-const getExcelData = (data: string): string => {
-	const tagText = "# Excel\n";
-	const trimLocation = data.search(tagText);
-	if (trimLocation == -1) return data;
-	const excelData = data.substring(
-		trimLocation + tagText.length,
-		data.length
-	);
-	// console.log("trimLocation", trimLocation, excelData, this.data);
-	return excelData;
-};
-
 /**
  *
  * @param el
@@ -161,7 +160,7 @@ export const markdownPostProcessor = async (
 	//check to see if we are rendering in editing mode or live preview
 	//if yes, then there should be no .internal-embed containers
 	const embeddedItems = el.querySelectorAll(".internal-embed");
-	console.log("markdownPostProcessor", embeddedItems.length);
+	// console.log("markdownPostProcessor", embeddedItems.length);
 	if (embeddedItems.length === 0) {
 		tmpObsidianWYSIWYG(el, ctx);
 		return;
@@ -174,7 +173,7 @@ const processReadingMode = async (
 	embeddedItems: NodeListOf<Element> | [HTMLElement],
 	ctx: MarkdownPostProcessorContext
 ) => {
-	console.log("processReadingMode");
+	// console.log("processReadingMode");
 	//We are processing a non-excalidraw file in reading mode
 	//Embedded files will be displayed in an .internal-embed container
 
