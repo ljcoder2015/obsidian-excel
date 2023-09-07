@@ -78,11 +78,21 @@ const tmpObsidianWYSIWYG = async (
 			return;
 		}
 		internalEmbedDiv.empty();
+
 		const data = await vault.read(file);
-		const sheetDiv = createSheetEl(
-			getExcelData(data),
-			internalEmbedDiv.clientWidth
-		);
+		const src = internalEmbedDiv.getAttribute("src") ?? "";
+		const alt = internalEmbedDiv.getAttribute("alt") ?? "";
+		const split = src.split("#");
+		var excelData = getExcelData(data);
+		if (split.length > 1) {
+			excelData = getExcelAreaData(
+				data,
+				split[1],
+				alt
+			);
+		}
+
+		const sheetDiv = createSheetEl(excelData, internalEmbedDiv.clientWidth);
 		if (markdownEmbed) {
 			//display image on canvas without markdown frame
 			internalEmbedDiv.removeClass("markdown-embed");
@@ -100,20 +110,22 @@ const tmpObsidianWYSIWYG = async (
 	internalEmbedDiv.setAttribute("ready", "");
 
 	internalEmbedDiv.empty();
+
 	const data = await vault.read(file);
-	
-	const src = internalEmbedDiv.getAttribute("src") ?? ""
-	const alt = internalEmbedDiv.getAttribute("alt") ?? ""
-	const split = src.split("#")
-	var excelData = getExcelData(data)
+	const src = internalEmbedDiv.getAttribute("src") ?? "";
+	const alt = internalEmbedDiv.getAttribute("alt") ?? "";
+	const split = src.split("#");
+	var excelData = getExcelData(data);
 	if (split.length > 1) {
-		excelData = getExcelAreaData(data, split[1], alt, internalEmbedDiv.clientWidth)
+		excelData = getExcelAreaData(
+			data,
+			split[1],
+			alt
+		);
 	}
-	console.log('internalEmbedDiv', excelData, src, alt)
-	const sheetDiv = createSheetEl(
-		excelData,
-		internalEmbedDiv.clientWidth
-	);
+
+	// console.log('internalEmbedDiv', excelData, src, alt)
+	const sheetDiv = createSheetEl(excelData, internalEmbedDiv.clientWidth);
 	if (markdownEmbed) {
 		//display image on canvas without markdown frame
 		internalEmbedDiv.removeClass("markdown-embed");
@@ -192,26 +204,38 @@ const processReadingMode = async (
 		//if the embeddedFile exits and it is an Excalidraw file
 		//then lets replace the .internal-embed with the generated PNG or SVG image
 		if (file && file instanceof TFile && plugin.isExcelFile(file)) {
-
 			maybeDrawing.parentElement?.replaceChild(
-				await processInternalEmbed(maybeDrawing,file),
+				await processInternalEmbed(maybeDrawing, file),
 				maybeDrawing
-			  );
+			);
 		}
 	});
 };
 
-const processInternalEmbed = async (internalEmbedEl: Element, file: TFile ):Promise<HTMLDivElement> => {
-
+const processInternalEmbed = async (
+	internalEmbedEl: Element,
+	file: TFile
+): Promise<HTMLDivElement> => {
 	const src = internalEmbedEl.getAttribute("src");
 	//@ts-ignore
 	if (!src) return;
-  
+
 	//https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/1059
 	internalEmbedEl.removeClass("markdown-embed");
 	internalEmbedEl.removeClass("inline-embed");
 
 	const data = await vault.read(file);
 
-	return await createSheetEl(getExcelData(data), internalEmbedEl.clientWidth);
-  }
+	const alt = internalEmbedEl.getAttribute("alt") ?? "";
+	const split = src.split("#");
+	var excelData = getExcelData(data);
+	if (split.length > 1) {
+		excelData = getExcelAreaData(
+			data,
+			split[1],
+			alt
+		);
+	}
+
+	return await createSheetEl(excelData, internalEmbedEl.clientWidth);
+};

@@ -26,8 +26,7 @@ export const getExcelData = (data: string): string => {
 export const getExcelAreaData = (
 	data: string,
 	sheet: string,
-	cells: string,
-	clientWidth: number
+	cells: string
 ): string => {
 	const excelData = getExcelData(data) || "{}";
 	const jsonData = JSON.parse(excelData) || [];
