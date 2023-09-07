@@ -7,6 +7,7 @@ import {
 import ExcelPlugin from "./main";
 import Spreadsheet from "x-data-spreadsheet";
 import { getExcelData, getExcelAreaData } from "./utils/DataUtils";
+import { text } from "stream/consumers";
 
 let plugin: ExcelPlugin;
 let vault: Vault;
@@ -92,7 +93,7 @@ const tmpObsidianWYSIWYG = async (
 			);
 		}
 
-		const sheetDiv = createSheetEl(excelData, internalEmbedDiv.clientWidth);
+		const sheetDiv = createSheetEl(excelData, file, internalEmbedDiv.clientWidth);
 		if (markdownEmbed) {
 			//display image on canvas without markdown frame
 			internalEmbedDiv.removeClass("markdown-embed");
@@ -125,7 +126,7 @@ const tmpObsidianWYSIWYG = async (
 	}
 
 	// console.log('internalEmbedDiv', excelData, src, alt)
-	const sheetDiv = createSheetEl(excelData, internalEmbedDiv.clientWidth);
+	const sheetDiv = createSheetEl(excelData, file, internalEmbedDiv.clientWidth);
 	if (markdownEmbed) {
 		//display image on canvas without markdown frame
 		internalEmbedDiv.removeClass("markdown-embed");
@@ -134,8 +135,29 @@ const tmpObsidianWYSIWYG = async (
 	internalEmbedDiv.appendChild(sheetDiv);
 };
 
-const createSheetEl = (data: string, width: number): HTMLDivElement => {
-	const sheetEle = createDiv({
+const createSheetEl = (data: string, file: TFile, width: number): HTMLDivElement => {
+
+	const sheetDiv = createDiv()
+
+	// <div class="internal-embed file-embed mod-generic is-loaded" tabindex="-1" src="Excel 2023-09-07 17.18.19.sheet" alt="Excel 2023-09-07 17.18.19.sheet" contenteditable="false"><div class="file-embed-title"><span class="file-embed-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-file"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></span> Excel 2023-09-07 17.18.19.sheet</div></div>
+	const fileEmbed = sheetDiv.createDiv({
+		cls: "internal-embed file-embed mod-generic is-loaded",
+		text: file.basename,
+		attr: {
+			src: file.basename,
+			alt: file.basename,
+			contenteditable: false,
+			tabindex: -1
+		}
+	})
+
+	// 点击按钮打开 sheet 
+	fileEmbed.onClickEvent((e) => {
+		e.stopPropagation()
+		plugin.app.workspace.getLeaf().openFile(file)
+	})
+	
+	const sheetEl = createDiv({
 		cls: "sheet-iframe",
 		attr: {
 			id: `x-spreadsheet-${new Date().getTime()}`,
@@ -145,7 +167,7 @@ const createSheetEl = (data: string, width: number): HTMLDivElement => {
 	const jsonData = JSON.parse(data || "{}") || {};
 	// console.log("createSheetEl", jsonData, data)
 	//@ts-ignore
-	const sheet = new Spreadsheet(sheetEle, {
+	const sheet = new Spreadsheet(sheetEl, {
 		mode: "read",
 		showToolbar: false,
 		showBottomBar: true,
@@ -157,7 +179,8 @@ const createSheetEl = (data: string, width: number): HTMLDivElement => {
 
 	// @ts-ignore
 	sheet.validate();
-	return sheetEle;
+	sheetDiv.appendChild(sheetEl)
+	return sheetDiv;
 };
 
 /**
@@ -237,5 +260,5 @@ const processInternalEmbed = async (
 		);
 	}
 
-	return await createSheetEl(excelData, internalEmbedEl.clientWidth);
+	return await createSheetEl(excelData, file, internalEmbedEl.clientWidth);
 };
