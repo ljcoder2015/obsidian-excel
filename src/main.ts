@@ -12,6 +12,7 @@ import { PaneTarget } from "./utils/ModifierkeyHelper";
 import { ExcelView } from "./ExcelView";
 import { getExcelFilename } from "./utils/FileUtils";
 import { around, dedupe } from "monkey-around";
+import { ExcelSettingTab } from "./ExcelSettingTab"
 
 import {
 	initializeMarkdownPostProcessor,
@@ -25,6 +26,11 @@ export default class ExcelPlugin extends Plugin {
 	private _loaded: boolean = false;
 
 	async onload() {
+		// 加载设置
+		await this.loadSettings()
+
+		this.addSettingTab(new ExcelSettingTab(this.app, this))
+
 		this.registerView(
 			VIEW_TYPE_EXCEL,
 			(leaf: WorkspaceLeaf) => new ExcelView(leaf, this)

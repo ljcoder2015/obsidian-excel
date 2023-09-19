@@ -115,18 +115,31 @@ const tmpObsidianWYSIWYG = async (
 	const data = await vault.read(file);
 	const src = internalEmbedDiv.getAttribute("src") ?? "";
 	const alt = internalEmbedDiv.getAttribute("alt") ?? "";
+	var range = alt
+
+	var heigh = 300
+	const matchResult = alt.match(/<(\d+)>/);
+
+	if (matchResult && matchResult.length > 1) {
+	  const extractedValue = matchResult[1];  // 获取匹配到的数字
+	//   console.log("Extracted value:", extractedValue);
+	  heigh = parseInt(extractedValue)
+	  range = range.replace(/<\d+>/, '');
+	} else {
+	//   console.log("No match found.");
+	}
 	const split = src.split("#");
 	var excelData = getExcelData(data);
 	if (split.length > 1) {
 		excelData = getExcelAreaData(
 			data,
 			split[1],
-			alt
+			range
 		);
 	}
 
 	// console.log('internalEmbedDiv', excelData, src, alt)
-	const sheetDiv = createSheetEl(excelData, file, internalEmbedDiv.clientWidth);
+	const sheetDiv = createSheetEl(excelData, file, internalEmbedDiv.clientWidth, heigh);
 	if (markdownEmbed) {
 		//display image on canvas without markdown frame
 		internalEmbedDiv.removeClass("markdown-embed");
@@ -135,7 +148,7 @@ const tmpObsidianWYSIWYG = async (
 	internalEmbedDiv.appendChild(sheetDiv);
 };
 
-const createSheetEl = (data: string, file: TFile, width: number): HTMLDivElement => {
+const createSheetEl = (data: string, file: TFile, width: number, height: number = 300): HTMLDivElement => {
 
 	const sheetDiv = createDiv()
 
@@ -161,6 +174,7 @@ const createSheetEl = (data: string, file: TFile, width: number): HTMLDivElement
 		cls: "sheet-iframe",
 		attr: {
 			id: `x-spreadsheet-${new Date().getTime()}`,
+			style: `height: ${height}px`
 		},
 	});
 
@@ -172,7 +186,7 @@ const createSheetEl = (data: string, file: TFile, width: number): HTMLDivElement
 		showToolbar: false,
 		showBottomBar: true,
 		view: {
-			height: () => 300,
+			height: () => height,
 			width: () => width,
 		},
 	}).loadData(jsonData); // load data

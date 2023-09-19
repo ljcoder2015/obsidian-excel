@@ -1,15 +1,17 @@
 export interface ExcelSettings {
 	folder: string;
 	excelFilenamePrefix: string,
-	excelEmbedPrefixWithFilename: true,
-	excelFilnameEmbedPostfix: string,
 	excelFilenameDateTime: string,
+	sheetHeight: string,
+	rowHeight: string,
+	colWidth: string
 }
 
 export const DEFAULT_SETTINGS: ExcelSettings = {
-	folder: "Excel",
+	folder: "/",
 	excelFilenamePrefix: "Excel ",
-	excelEmbedPrefixWithFilename: true,
-	excelFilnameEmbedPostfix: " ",
 	excelFilenameDateTime: "YYYY-MM-DD HH.mm.ss",
+	sheetHeight: "300",
+	rowHeight: "25",
+	colWidth: "100"
 };
