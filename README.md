@@ -17,11 +17,11 @@ embed link rule:
 
 > ![[`file-folder`/`file-name`#`sheet-name`|`sri`-`sci`:`eri`-`eci`<`sheet-height`>]]
 
-
-
 ![link](./doc/img/link.gif)
 
 ![link](./doc/img/part-link.gif)
+
+![link](./doc//img/embed-link-height.gif)
 
 ### copy selected cells to HTML
 
@@ -29,7 +29,11 @@ embed link rule:
 
 ### Setting
 
-![setting](./doc//img/setting.png)
+![setting](./doc/img/setting-file.gif)
+
+![setting](./doc/img/setting-embed.gif)
+
+![setting](./doc//img/setting-sheet.gif)
 
 ### E-mail
 
