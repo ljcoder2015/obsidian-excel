@@ -97,8 +97,10 @@ export function getNewUniqueFilepath(
 
 export function getExcelFilename(settings: ExcelSettings): string {
   return (
-    "Excel " +
-    window.moment().format('YYYY-MM-DD HH.mm.ss') +
+    settings.excelFilenamePrefix +
+    (settings.excelFilenameDateTime !== ""
+      ? window.moment().format(settings.excelFilenameDateTime)
+      : "") +
     ".sheet.md"
   );
 }

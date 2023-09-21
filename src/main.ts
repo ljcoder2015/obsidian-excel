@@ -6,11 +6,14 @@ import {
 	ViewState,
 	MarkdownView,
 	Workspace,
+	MenuItem,
+	Menu,
+	MetadataCache
 } from "obsidian";
 import { ExcelSettings, DEFAULT_SETTINGS } from "./utils/Settings";
 import { PaneTarget } from "./utils/ModifierkeyHelper";
 import { ExcelView } from "./ExcelView";
-import { getExcelFilename } from "./utils/FileUtils";
+import { checkAndCreateFolder, getExcelFilename, getNewUniqueFilepath } from "./utils/FileUtils";
 import { around, dedupe } from "monkey-around";
 import { ExcelSettingTab } from "./ExcelSettingTab"
 
@@ -52,6 +55,8 @@ export default class ExcelPlugin extends Plugin {
 		this.switchToExcelAfterLoad();
 
 		this.registerEventListeners();
+
+		this.registerCommands()
 	}
 
 	onunload() {}
@@ -113,6 +118,32 @@ export default class ExcelPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
+	private registerCommands() {
+		const fileMenuHandlerCreateNew = (menu: Menu, file: TFile) => {
+			menu.addItem((item: MenuItem) => {
+			  item
+				.setTitle("Create Excel File")
+				.onClick((e) => {
+				  let folderpath = file.path;
+				  if (file instanceof TFile) {
+					folderpath = normalizePath(
+					  file.path.substr(0, file.path.lastIndexOf(file.name)),
+					);
+				  }
+				  this.createAndOpenExcel(
+					getExcelFilename(this.settings),
+					folderpath,
+				  );
+				});
+			});
+		  };
+	  
+		  this.registerEvent(
+			this.app.workspace.on("file-menu", fileMenuHandlerCreateNew),
+		  );
+	  
+	}
+
 	private registerMonkeyPatches() {
 		const key =
 			"https://github.com/zsviczian/obsidian-excalidraw-plugin/issues";
@@ -150,54 +181,6 @@ export default class ExcelPlugin extends Plugin {
 				})
 			);
 		}
-		this.registerEvent(
-			this.app.workspace.on("editor-menu", (menu, editor, view) => {
-				if (!view || !(view instanceof MarkdownView)) return;
-				const file = view.file;
-				const leaf = view.leaf;
-				if (!file) return;
-				const cache = this.app.metadataCache.getFileCache(file);
-				if (!cache?.frontmatter || !cache.frontmatter[FRONTMATTER_KEY])
-					return;
-
-				menu.addItem((item) =>
-					item
-						.setTitle("OPEN_AS_EXCEL")
-						.setIcon("grid")
-						.setSection("excel")
-						.onClick(() => {
-							//@ts-ignore
-							this.excelFileModes[leaf.id || file.path] =
-								VIEW_TYPE_EXCEL;
-							this.setExcelView(leaf);
-						})
-				);
-			})
-		);
-
-		this.registerEvent(
-			this.app.workspace.on("file-menu", (menu, file, source, leaf) => {
-				if (!leaf || !(leaf.view instanceof MarkdownView)) return;
-				if (!(file instanceof TFile)) return;
-				const cache = this.app.metadataCache.getFileCache(file);
-				if (!cache?.frontmatter || !cache.frontmatter[FRONTMATTER_KEY])
-					return;
-
-				menu.addItem((item) => {
-					item.setTitle("OPEN_AS_EXCEL")
-						.setIcon("grid")
-						.setSection("pane")
-						.onClick(() => {
-							//@ts-ignore
-							this.excelFileModes[leaf.id || file.path] =
-								VIEW_TYPE_EXCEL;
-							this.setExcelView(leaf);
-						});
-				});
-				//@ts-ignore
-				menu.items.unshift(menu.items.pop());
-			})
-		);
 
 		const self = this;
 		// Monkey patch WorkspaceLeaf to open Excalidraw drawings with ExcalidrawView by default
@@ -233,13 +216,13 @@ export default class ExcelPlugin extends Plugin {
 								"markdown"
 						) {
 							// Then check for the excalidraw frontMatterKey
-							const cache = app.metadataCache.getCache(
+							const cache = this.app.metadataCache.getFileCache(
 								state.state.file
 							);
 
 							if (
 								cache?.frontmatter &&
-								cache.frontmatter[FRONTMATTER_KEY]
+								cache?.frontmatter[FRONTMATTER_KEY]
 							) {
 								// If we have it, force the view type to excalidraw
 								const newState = {
@@ -274,9 +257,13 @@ export default class ExcelPlugin extends Plugin {
 		foldername?: string,
 		initData?: string
 	): Promise<TFile> {
+		const folderpath = normalizePath(
+			foldername ? foldername : this.settings.folder,
+		  );
+		await checkAndCreateFolder(folderpath)
 
-		const fname = normalizePath(filename);
-		const file = await this.app.vault.create(fname, initData ?? "{}");
+		const fname = getNewUniqueFilepath(this.app.vault, filename, folderpath);
+		const file = await this.app.vault.create(fname, initData ?? this.getBlackData());
 
 		return file;
 	}
@@ -336,7 +323,7 @@ export default class ExcelPlugin extends Plugin {
 		}
 		const fileCache = f ? this.app.metadataCache.getFileCache(f) : null;
 		return (
-			!!fileCache?.frontmatter && !!fileCache.frontmatter[FRONTMATTER_KEY]
+			!!fileCache?.frontmatter && !!fileCache?.frontmatter?.FRONTMATTER_KEY
 		);
 	}
 }

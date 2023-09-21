@@ -112,11 +112,10 @@ export class ExcelView extends TextFileView {
 		const eri = this.cellsSelected.eri;
 		const eci = this.cellsSelected.eci;
 
-		
 		// 格式 sri-sci:eri-eci
 		if (this.file && data && sri && sci && eri && eci) {
-			const link = `![[${this.file.basename}#${data.name}|${sri}-${sci}:${eri}-${eci}]]`
-			console.log(this.file, link)
+			const link = `![[${this.file.basename}#${data.name}|${sri}-${sci}:${eri}-${eci}]]`;
+			console.log(this.file, link);
 			navigator.clipboard.writeText(link);
 			new Notice("Copy embed link to clipboard");
 		} else {
@@ -146,8 +145,6 @@ export class ExcelView extends TextFileView {
 
 		super.onload();
 	}
-
-	
 
 	getViewType(): string {
 		return VIEW_TYPE_EXCEL;
@@ -187,23 +184,33 @@ export class ExcelView extends TextFileView {
 				height: () => this.contentEl.clientHeight,
 				width: () => this.contentEl.clientWidth,
 			},
+			row: {
+				len: 100,
+				height: parseInt(this.plugin.settings.rowHeight),
+			},
+			col: {
+				len: 26,
+				width: parseInt(this.plugin.settings.colWidth),
+				indexWidth: 60,
+				minWidth: 60,
+			},
 		})
 			.loadData(jsonData) // load data
 			.change(() => {
 				// save data to db
 				const data = this.sheet.getData();
 				// console.log("save data to db", data);
-				this.saveData(JSON.stringify(data))
+				this.saveData(JSON.stringify(data));
 			})
 			.onAddSheet(() => {
 				const data = this.sheet.getData();
 				// console.log('onAddSheet', data)
-				this.saveData(JSON.stringify(data))
+				this.saveData(JSON.stringify(data));
 			})
 			.onRenameSheet(() => {
 				const data = this.sheet.getData();
 				// console.log('onRenameSheet', data)
-				this.saveData(JSON.stringify(data))
+				this.saveData(JSON.stringify(data));
 			});
 
 		this.sheet.on("cells-selected", (sheetData, { sri, sci, eri, eci }) => {

@@ -117,7 +117,7 @@ const tmpObsidianWYSIWYG = async (
 	const alt = internalEmbedDiv.getAttribute("alt") ?? "";
 	var range = alt
 
-	var heigh = 300
+	var heigh = parseInt(plugin.settings.sheetHeight)
 	const matchResult = alt.match(/<(\d+)>/);
 
 	if (matchResult && matchResult.length > 1) {
@@ -188,6 +188,16 @@ const createSheetEl = (data: string, file: TFile, width: number, height: number 
 		view: {
 			height: () => height,
 			width: () => width,
+		},
+		row: {
+			len: 100,
+			height: parseInt(plugin.settings.rowHeight),
+		},
+		col: {
+			len: 26,
+			width: parseInt(plugin.settings.colWidth),
+			indexWidth: 60,
+			minWidth: 60,
 		},
 	}).loadData(jsonData); // load data
 
