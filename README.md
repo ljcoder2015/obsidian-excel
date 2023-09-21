@@ -13,6 +13,12 @@ If you are using Microsoft Office 365 to create xlsx files, you need to import t
 
 ### embed link to markdown
 
+embed link rule:
+
+> ![[`file-folder`/`file-name`#`sheet-name`|`sri`-`sci`:`eri`-`eci`<`sheet-height`>]]
+
+
+
 ![link](./doc/img/link.gif)
 
 ![link](./doc/img/part-link.gif)
@@ -20,6 +26,10 @@ If you are using Microsoft Office 365 to create xlsx files, you need to import t
 ### copy selected cells to HTML
 
 ![html](./doc/img/html.gif)
+
+### Setting
+
+![setting](./doc//img/setting.png)
 
 ### E-mail
 

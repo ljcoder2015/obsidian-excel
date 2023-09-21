@@ -8,7 +8,6 @@ import {
 	Workspace,
 	MenuItem,
 	Menu,
-	MetadataCache
 } from "obsidian";
 import { ExcelSettings, DEFAULT_SETTINGS } from "./utils/Settings";
 import { PaneTarget } from "./utils/ModifierkeyHelper";
@@ -182,6 +181,56 @@ export default class ExcelPlugin extends Plugin {
 			);
 		}
 
+		this.registerEvent(
+			this.app.workspace.on("editor-menu", (menu, editor, view) => {
+				if (!view || !(view instanceof MarkdownView)) return;
+				const file = view.file;
+				const leaf = view.leaf;
+				if (!file) return;
+				const cache = this.app.metadataCache.getFileCache(file);
+				console.log('---', cache)
+				if (!cache?.frontmatter || !cache?.frontmatter?.FRONTMATTER_KEY)
+					return;
+
+				menu.addItem((item) =>
+					item
+						.setTitle("OPEN_AS_EXCEL")
+						.setIcon("grid")
+						.setSection("excel")
+						.onClick(() => {
+							//@ts-ignore
+							this.excelFileModes[leaf.id || file.path] =
+								VIEW_TYPE_EXCEL;
+							this.setExcelView(leaf);
+						})
+				);
+			})
+		);
+
+		this.registerEvent(
+			this.app.workspace.on("file-menu", (menu, file, source, leaf) => {
+				if (!leaf || !(leaf.view instanceof MarkdownView)) return;
+				if (!(file instanceof TFile)) return;
+				const cache = this.app.metadataCache.getFileCache(file);
+				if (!cache?.frontmatter || !cache?.frontmatter?.FRONTMATTER_KEY)
+					return;
+
+				menu.addItem((item) => {
+					item.setTitle("OPEN_AS_EXCEL")
+						.setIcon("grid")
+						.setSection("pane")
+						.onClick(() => {
+							//@ts-ignore
+							this.excelFileModes[leaf.id || file.path] =
+								VIEW_TYPE_EXCEL;
+							this.setExcelView(leaf);
+						});
+				});
+				//@ts-ignore
+				menu.items.unshift(menu.items.pop());
+			})
+		);
+
 		const self = this;
 		// Monkey patch WorkspaceLeaf to open Excalidraw drawings with ExcalidrawView by default
 		this.register(
@@ -216,7 +265,7 @@ export default class ExcelPlugin extends Plugin {
 								"markdown"
 						) {
 							// Then check for the excalidraw frontMatterKey
-							const cache = this.app.metadataCache.getFileCache(
+							const cache = this.app.metadataCache.getCache(
 								state.state.file
 							);
 
@@ -323,7 +372,7 @@ export default class ExcelPlugin extends Plugin {
 		}
 		const fileCache = f ? this.app.metadataCache.getFileCache(f) : null;
 		return (
-			!!fileCache?.frontmatter && !!fileCache?.frontmatter?.FRONTMATTER_KEY
+			!!fileCache?.frontmatter && !!fileCache?.frontmatter[FRONTMATTER_KEY]
 		);
 	}
 }
