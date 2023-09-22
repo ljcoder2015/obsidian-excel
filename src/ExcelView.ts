@@ -54,7 +54,7 @@ export class ExcelView extends TextFileView {
 	setViewData(data: string, clear: boolean): void {
 		this.data = data;
 
-		app.workspace.onLayoutReady(async () => {
+		this.app.workspace.onLayoutReady(async () => {
 			// console.log('setViewData')
 			await this.refresh();
 		});

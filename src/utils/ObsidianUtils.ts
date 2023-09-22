@@ -2,11 +2,12 @@ import ExcelPlugin from "src/main";
 import { WorkspaceLeaf } from "obsidian";
 
 const getLeafLoc = (
+	plugin: ExcelPlugin,
 	leaf: WorkspaceLeaf
 ): ["main" | "popout" | "left" | "right" | "hover", any] => {
 	//@ts-ignore
 	const leafId = leaf.id;
-	const layout = app.workspace.getLayout();
+	const layout = plugin.app.workspace.getLayout();
 	const getLeaves = (l: any) =>
 		l.children
 			.filter((c: any) => c.type !== "leaf")
@@ -47,12 +48,12 @@ export const getNewOrAdjacentLeaf = (
 	plugin: ExcelPlugin,
 	leaf: WorkspaceLeaf
 ): WorkspaceLeaf | null => {
-	const [leafLoc, mainLeavesIds] = getLeafLoc(leaf);
+	const [leafLoc, mainLeavesIds] = getLeafLoc(plugin, leaf);
 
 	const getMostRecentOrAvailableLeafInMainWorkspace = (
 		inDifferentTabGroup?: boolean
 	): WorkspaceLeaf | null => {
-		let mainLeaf = app.workspace.getMostRecentLeaf();
+		let mainLeaf = plugin.app.workspace.getMostRecentLeaf();
 		if (
 			mainLeaf &&
 			mainLeaf !== leaf &&
@@ -64,7 +65,7 @@ export const getNewOrAdjacentLeaf = (
 		//Iterate all leaves in the main workspace and find the first one that is not the originating leaf
 		mainLeaf = null;
 		mainLeavesIds.forEach((id: any) => {
-			const l = app.workspace.getLeafById(id);
+			const l = plugin.app.workspace.getLeafById(id);
 			if (
 				mainLeaf ||
 				!l.view?.navigation ||
@@ -83,7 +84,7 @@ export const getNewOrAdjacentLeaf = (
 	) {
 		//1.2 - Reuse leaf if it is adjacent
 		const ml = getMostRecentOrAvailableLeafInMainWorkspace(true);
-		return ml ?? app.workspace.createLeafBySplit(leaf); //app.workspace.getLeaf(true);
+		return ml ?? plugin.app.workspace.createLeafBySplit(leaf); //app.workspace.getLeaf(true);
 	}
 
 	// //3
@@ -106,7 +107,7 @@ export const getNewOrAdjacentLeaf = (
 	//4
 	if (leafLoc === "popout") {
 		const popoutLeaves = new Set<WorkspaceLeaf>();
-		app.workspace.iterateAllLeaves((l) => {
+		plugin.app.workspace.iterateAllLeaves((l) => {
 			if (
 				l !== leaf &&
 				l.view.navigation &&
@@ -117,7 +118,7 @@ export const getNewOrAdjacentLeaf = (
 			}
 		});
 		if (popoutLeaves.size === 0) {
-			return app.workspace.createLeafBySplit(leaf);
+			return plugin.app.workspace.createLeafBySplit(leaf);
 		}
 		return Array.from(popoutLeaves)[0];
 	}

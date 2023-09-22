@@ -7,7 +7,6 @@ import {
 import ExcelPlugin from "./main";
 import Spreadsheet from "x-data-spreadsheet";
 import { getExcelData, getExcelAreaData } from "./utils/DataUtils";
-import { text } from "stream/consumers";
 
 let plugin: ExcelPlugin;
 let vault: Vault;
