@@ -237,16 +237,16 @@ export class ExcelView extends TextFileView {
 
 	copyToHTML() {
 		const data = this.cellsSelected.sheet;
-		const sri = this.cellsSelected.sri;
-		const sci = this.cellsSelected.sci;
-		const eri = this.cellsSelected.eri;
-		const eci = this.cellsSelected.eci;
+		const sri = this.cellsSelected.sri || 0;
+		const sci = this.cellsSelected.sci || 0;
+		const eri = this.cellsSelected.eri || 0;
+		const eci = this.cellsSelected.eci || 0;
 
 		// console.log('data', data, sri, sci, eri, eci)
 
 		var html = "<table>";
 
-		if (data && sri && sci && eri && eci) {
+		if (data) {
 			for (var row = sri; row <= eri; row++) {
 				html += "<tr>";
 				const cells = data.rows._[`${row}`];

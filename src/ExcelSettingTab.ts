@@ -1,5 +1,6 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import ExcelPlugin from "./main";
+import { t } from "./lang/helpers"
 
 export class ExcelSettingTab extends PluginSettingTab {
 	plugin: ExcelPlugin;
