@@ -15,11 +15,11 @@ export class ExcelSettingTab extends PluginSettingTab {
 
         containerEl.empty()
 
-        containerEl.createEl("h1", { text: "File Setting / 文件设置" });
+        containerEl.createEl("h1", { text: t("FILE_SETTING") });
 
         new Setting(containerEl)
-            .setName("Folder")
-            .setDesc("Create files in this folder by default / 默认在此文件夹下创建文件")
+            .setName(t("FOLDER"))
+            .setDesc(t("FOLDER_DESC"))
             .addText((text) => 
                 text
                     .setPlaceholder("/")
@@ -31,8 +31,8 @@ export class ExcelSettingTab extends PluginSettingTab {
             )
 
         new Setting(containerEl)
-            .setName("Filename Prefix / 文件名前缀")
-            .setDesc("filename prefi / 设置文件名前缀")
+            .setName(t("FILENAME_PREFIX"))
+            .setDesc(t("FILENAME_PREFIX_DESC"))
             .addText((text) => 
                 text
                     .setPlaceholder("Excel")
@@ -44,8 +44,8 @@ export class ExcelSettingTab extends PluginSettingTab {
             )
 
         new Setting(containerEl)
-            .setName("Filename Date Time/ 文件名时间格式")
-            .setDesc("filename date time / 文件名时间格式")
+            .setName(t("FILENAME_DATE_TIME"))
+            .setDesc(t("FILENAME_DATE_TIME_DESC"))
             .addText((text) => 
                 text
                     .setPlaceholder("YYYY-MM-DD HH.mm.ss")
@@ -56,11 +56,11 @@ export class ExcelSettingTab extends PluginSettingTab {
                     })
             )
 
-        containerEl.createEl("h1", { text: "Embed Link Setting / 嵌入链接设置" });
+        containerEl.createEl("h1", { text: t("EMBED_LINK_SETTING") });
                     
         new Setting(containerEl)
-            .setName("Sheet Height/ 表格高度")
-            .setDesc("default height for rendering spreadsheets / 渲染表格的默认高度")
+            .setName(t("SHEET_HEIGHT"))
+            .setDesc(t("SHEET_HEIGHT_DESC"))
             .addText((text) => 
                 text
                     .setPlaceholder("300")
@@ -71,11 +71,11 @@ export class ExcelSettingTab extends PluginSettingTab {
                     })
             )
 
-        containerEl.createEl("h1", { text: "Sheet Setting / 表格设置" });
+        containerEl.createEl("h1", { text: t("SHEET_SETTING") });
 
         new Setting(containerEl)
-            .setName("Row Height/ 行高度")
-            .setDesc("default row height / 默认行高")
+            .setName(t("ROW_HEIGHT"))
+            .setDesc(t("ROW_HEIGHT_DESC"))
             .addText((text) => 
                 text
                     .setPlaceholder("25")
@@ -87,8 +87,8 @@ export class ExcelSettingTab extends PluginSettingTab {
             )
 
         new Setting(containerEl)
-            .setName("Column Width/ 列宽度")
-            .setDesc("default column width / 默认列的宽度")
+            .setName(t("COLUMN_WIDTH"))
+            .setDesc(t("COLUMN_WIDTH_DESC"))
             .addText((text) => 
                 text
                     .setPlaceholder("25")

@@ -1,5 +1,5 @@
 import ExcelPlugin from "src/main";
-import { TextFileView, WorkspaceLeaf, Platform, Notice } from "obsidian";
+import { TextFileView, WorkspaceLeaf, Platform, Notice, moment } from "obsidian";
 import Spreadsheet from "x-data-spreadsheet";
 import * as XLSX from "xlsx";
 import { stox, xtos } from "./utils/xlsxspread";
@@ -177,6 +177,12 @@ export class ExcelView extends TextFileView {
 		// 初始化 sheet
 		const jsonData = JSON.parse(getExcelData(this.data) || "{}") || {};
 
+		// 设置多语言
+		if (moment.locale() === 'zh-cn') {
+			console.log(zhCn)
+			Spreadsheet.locale('zh-cn', zhCn)
+		}
+		
 		//@ts-ignore
 		this.sheet = new Spreadsheet(this.sheetEle, {
 			showBottomBar: true,
