@@ -5,6 +5,9 @@ import * as XLSX from "xlsx";
 import { stox, xtos } from "./utils/xlsxspread";
 import { VIEW_TYPE_EXCEL, FRONTMATTER } from "./constants";
 import { getExcelData } from "./utils/DataUtils";
+import zhCn from "./lang/locale/sheet-zh-cn"
+import en from "./lang/locale/sheet-en"
+import { t } from "./lang/helpers"
 
 export class ExcelView extends TextFileView {
 	public plugin: ExcelPlugin;
@@ -70,7 +73,7 @@ export class ExcelView extends TextFileView {
 		//@ts-ignore
 		const files = e.target?.files;
 		if (!files) {
-			new Notice("Failed to get file");
+			new Notice(t("GET_FILE_FAILED"));
 			return;
 		}
 		const f = files[0];
@@ -81,7 +84,7 @@ export class ExcelView extends TextFileView {
 			if (data) {
 				this.process_wb(XLSX.read(data));
 			} else {
-				new Notice("Read file error");
+				new Notice(t("READ_FILE_FAILED"));
 			}
 		};
 		reader.readAsArrayBuffer(f);
@@ -93,7 +96,7 @@ export class ExcelView extends TextFileView {
 			this.sheet.loadData(sheetData);
 			this.saveData(JSON.stringify(sheetData));
 		} else {
-			new Notice("Data parsing error");
+			new Notice(t("DATA_PARSING_ERROR"));
 		}
 	}
 
@@ -113,13 +116,13 @@ export class ExcelView extends TextFileView {
 		const eci = this.cellsSelected.eci;
 
 		// 格式 sri-sci:eri-eci
-		if (this.file && data && sri && sci && eri && eci) {
+		if (this.file && data) {
 			const link = `![[${this.file.basename}#${data.name}|${sri}-${sci}:${eri}-${eci}]]`;
-			console.log(this.file, link);
+			// console.log(this.file, link);
 			navigator.clipboard.writeText(link);
-			new Notice("Copy embed link to clipboard");
+			new Notice(t("COPY_EMBED_LINK_SUCCESS"));
 		} else {
-			new Notice("Copy embed link failed");
+			new Notice(t("COPY_EMBED_LINK_FAILED"));
 		}
 	}
 
@@ -127,19 +130,19 @@ export class ExcelView extends TextFileView {
 		this.ownerWindow = this.containerEl.win;
 
 		// 添加顶部导入按钮
-		this.importEle = this.addAction("download", "import xlsx file", (ev) =>
+		this.importEle = this.addAction("download", t("IMPORT_XLSX_FILE"), (ev) =>
 			this.handleImportClick(ev)
 		);
 
-		this.exportEle = this.addAction("upload", "export xlsx file", (ev) =>
+		this.exportEle = this.addAction("upload", t("EXPORT_XLSX_FILE"), (ev) =>
 			this.handleExportClick(ev)
 		);
 
-		this.embedLinkEle = this.addAction("link", "copy embed link", (ev) =>
+		this.embedLinkEle = this.addAction("link", t("COPY_EMBED_LINK"), (ev) =>
 			this.handleEmbedLink(ev)
 		);
 
-		this.copyHTMLEle = this.addAction("file-code", "copy to HTML", (ev) =>
+		this.copyHTMLEle = this.addAction("file-code", t("COPY_TO_HTML"), (ev) =>
 			this.copyToHTML()
 		);
 
@@ -179,8 +182,9 @@ export class ExcelView extends TextFileView {
 
 		// 设置多语言
 		if (moment.locale() === 'zh-cn') {
-			console.log(zhCn)
 			Spreadsheet.locale('zh-cn', zhCn)
+		} else {
+			Spreadsheet.locale('en', en)
 		}
 		
 		//@ts-ignore
@@ -255,32 +259,54 @@ export class ExcelView extends TextFileView {
 		if (data) {
 			for (var row = sri; row <= eri; row++) {
 				html += "<tr>";
-				const cells = data.rows._[`${row}`];
-				// console.log('cells', row, cells.cells)
-				if (cells) {
-					for (var col = sci; col <= eci; col++) {
+				
+				// 记录合并单元格数量
+				var mergeMap = {}
+				for (var col = sci; col <= eci; col++) {
+					
+					// 获取当前行的数据
+					const cells = data.rows._[`${row}`];
+					if (cells) {
+						// 如果当前行有数据
+						// 获取单元格数据
 						const cell = cells.cells[`${col}`];
-						// console.log('cell', row, col, cell)
 						if (cell) {
+							// 如果单元格有数据展示数据
 							if (cell.merge) {
-								html += `<td rowspan="${cell.merge[0]}" colspan="${cell.merge[1]}">${cell.text}</td>`;
+								// 是否有合并单元格的操作
+								var mergeRow = cell.merge[0] + 1
+								var mergeCol = cell.merge[1] + 1
+
+								// 有合并行
+								// for(var r = 1; r < mergeRow; r ++) {
+								// 	const index = `${row + r}-${col}`
+								// 	mergeMap.index = true
+								// }
+	
+								html += `<td rowspan="${mergeRow}" colspan="${mergeCol}">${cell.text}</td>`;
 							} else {
 								html += `<td>${cell.text}</td>`;
 							}
+						} else {
+							// 单元格没数据添加空白单元格
+							html += `<td></td>`;
 						}
+					} else {
+						// 整行都没数据
+						html += `<td></td>`;
 					}
 				}
 
 				html += "</tr>";
 			}
 		} else {
-			new Notice("Please first select the data to copy");
+			new Notice(t("PLEASE_SELECT_DATA"));
 		}
 
 		html += "</table>";
 
 		navigator.clipboard.writeText(html);
-		new Notice("copied");
+		new Notice(t("COPY_TO_HTML_SUCCESS"));
 	}
 
 	onResize() {

@@ -16,6 +16,8 @@ import { checkAndCreateFolder, getExcelFilename, getNewUniqueFilepath } from "./
 import { around, dedupe } from "monkey-around";
 import { ExcelSettingTab } from "./ExcelSettingTab"
 
+import { t } from "./lang/helpers"
+
 import {
 	initializeMarkdownPostProcessor,
 	markdownPostProcessor,
@@ -121,7 +123,7 @@ export default class ExcelPlugin extends Plugin {
 		const fileMenuHandlerCreateNew = (menu: Menu, file: TFile) => {
 			menu.addItem((item: MenuItem) => {
 			  item
-				.setTitle("Create Excel File")
+				.setTitle(t("CREATE_EXCEL"))
 				.onClick((e) => {
 				  let folderpath = file.path;
 				  if (file instanceof TFile) {
@@ -188,13 +190,13 @@ export default class ExcelPlugin extends Plugin {
 				const leaf = view.leaf;
 				if (!file) return;
 				const cache = this.app.metadataCache.getFileCache(file);
-				console.log('---', cache)
+			
 				if (!cache?.frontmatter || !cache?.frontmatter?.FRONTMATTER_KEY)
 					return;
 
 				menu.addItem((item) =>
 					item
-						.setTitle("OPEN_AS_EXCEL")
+						.setTitle(t("OPEN_AS_EXCEL"))
 						.setIcon("grid")
 						.setSection("excel")
 						.onClick(() => {
@@ -216,7 +218,7 @@ export default class ExcelPlugin extends Plugin {
 					return;
 
 				menu.addItem((item) => {
-					item.setTitle("OPEN_AS_EXCEL")
+					item.setTitle(t("OPEN_AS_EXCEL"))
 						.setIcon("grid")
 						.setSection("pane")
 						.onClick(() => {

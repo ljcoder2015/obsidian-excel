@@ -1,6 +1,29 @@
 
 // English
 export default {
+  // Main.ts
+   CREATE_EXCEL: "Create Excel File",
+   OPEN_AS_EXCEL: "Open as Excel",
+
+   // ExcelView.ts
+   GET_FILE_FAILED: "Failed to get file",
+   READ_FILE_FAILED: "Read file error",
+   DATA_PARSING_ERROR: "Data parsing error",
+   COPY_EMBED_LINK: "copy embed link",
+   COPY_EMBED_LINK_SUCCESS: "Copy embed link to clipboard",
+   COPY_EMBED_LINK_FAILED: "Copy embed link failed",
+
+   COPY_TO_HTML_FAILED: "Copy embed link failed",
+   COPY_TO_HTML_SUCCESS: "copy to HTML",
+   COPY_TO_HTML: "copy to HTML",
+   
+   
+   PLEASE_SELECT_DATA: "Please first select the data to copy",
+
+   IMPORT_XLSX_FILE: "import xlsx file",
+   EXPORT_XLSX_FILE: "export xlsx file",
+   
+
   // ExcelSettingTab.ts
   FILE_SETTING: "File Setting",
   FOLDER: "FOLDER",
