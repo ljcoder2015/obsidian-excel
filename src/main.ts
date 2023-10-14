@@ -26,7 +26,6 @@ import { FRONTMATTER_KEY, FRONTMATTER, VIEW_TYPE_EXCEL } from "src/constants";
 
 export default class ExcelPlugin extends Plugin {
 	public settings: ExcelSettings;
-	public excelFileModes: { [file: string]: string } = {};
 	private _loaded: boolean = false;
 
 	async onload() {
@@ -42,7 +41,7 @@ export default class ExcelPlugin extends Plugin {
 		this.registerExtensions(["sheet"], VIEW_TYPE_EXCEL);
 
 		// This creates an icon in the left ribbon.
-		this.addRibbonIcon("table", "Excel", (e: MouseEvent) => {
+		this.addRibbonIcon("table", t("CREATE_EXCEL"), (e: MouseEvent) => {
 			// Called when the user clicks the icon.
 			this.createAndOpenExcel(getExcelFilename(this.settings), undefined, this.getBlackData());
 		});
@@ -98,9 +97,6 @@ export default class ExcelPlugin extends Plugin {
 					leaf.view.file &&
 					self.isExcelFile(leaf.view.file)
 				) {
-					self.excelFileModes[
-						(leaf as any).id || leaf.view.file?.path
-					] = VIEW_TYPE_EXCEL;
 					self.setExcelView(leaf);
 				}
 			}
@@ -183,56 +179,6 @@ export default class ExcelPlugin extends Plugin {
 			);
 		}
 
-		this.registerEvent(
-			this.app.workspace.on("editor-menu", (menu, editor, view) => {
-				if (!view || !(view instanceof MarkdownView)) return;
-				const file = view.file;
-				const leaf = view.leaf;
-				if (!file) return;
-				const cache = this.app.metadataCache.getFileCache(file);
-			
-				if (!cache?.frontmatter || !cache?.frontmatter?.FRONTMATTER_KEY)
-					return;
-
-				menu.addItem((item) =>
-					item
-						.setTitle(t("OPEN_AS_EXCEL"))
-						.setIcon("grid")
-						.setSection("excel")
-						.onClick(() => {
-							//@ts-ignore
-							this.excelFileModes[leaf.id || file.path] =
-								VIEW_TYPE_EXCEL;
-							this.setExcelView(leaf);
-						})
-				);
-			})
-		);
-
-		this.registerEvent(
-			this.app.workspace.on("file-menu", (menu, file, source, leaf) => {
-				if (!leaf || !(leaf.view instanceof MarkdownView)) return;
-				if (!(file instanceof TFile)) return;
-				const cache = this.app.metadataCache.getFileCache(file);
-				if (!cache?.frontmatter || !cache?.frontmatter?.FRONTMATTER_KEY)
-					return;
-
-				menu.addItem((item) => {
-					item.setTitle(t("OPEN_AS_EXCEL"))
-						.setIcon("grid")
-						.setSection("pane")
-						.onClick(() => {
-							//@ts-ignore
-							this.excelFileModes[leaf.id || file.path] =
-								VIEW_TYPE_EXCEL;
-							this.setExcelView(leaf);
-						});
-				});
-				//@ts-ignore
-				menu.items.unshift(menu.items.pop());
-			})
-		);
-
 		const self = this;
 		// Monkey patch WorkspaceLeaf to open Excalidraw drawings with ExcalidrawView by default
 		this.register(
@@ -241,15 +187,6 @@ export default class ExcelPlugin extends Plugin {
 				// while the file is open. When the file closes, we no longer need to keep track of it.
 				detach(next) {
 					return function () {
-						const state = this.view?.getState();
-						// console.log('state--', state.file)
-						if (
-							state?.file &&
-							self.excelFileModes[this.id || state.file]
-						) {
-							delete self.excelFileModes[this.id || state.file];
-						}
-
 						return next.apply(this);
 					};
 				},
@@ -261,28 +198,24 @@ export default class ExcelPlugin extends Plugin {
 							self._loaded &&
 							// If we have a markdown file
 							state.type === "markdown" &&
-							state.state?.file &&
-							// And the current mode of the file is not set to markdown
-							self.excelFileModes[this.id || state.state.file] !==
-								"markdown"
+							state.state?.file
 						) {
 							// Then check for the excalidraw frontMatterKey
 							const cache = this.app.metadataCache.getCache(
 								state.state.file
 							);
 
+							// console.log("setViewState", cache)
 							if (
 								cache?.frontmatter &&
 								cache?.frontmatter[FRONTMATTER_KEY]
 							) {
+								// console.log("setViewState --", cache)
 								// If we have it, force the view type to excalidraw
 								const newState = {
 									...state,
 									type: VIEW_TYPE_EXCEL,
 								};
-
-								self.excelFileModes[state.state.file] =
-									VIEW_TYPE_EXCEL;
 
 								return next.apply(this, [newState, ...rest]);
 							}
@@ -311,7 +244,7 @@ export default class ExcelPlugin extends Plugin {
 		const folderpath = normalizePath(
 			foldername ? foldername : this.settings.folder,
 		  );
-		await checkAndCreateFolder(folderpath)
+		await checkAndCreateFolder(this.app.vault, folderpath)
 
 		const fname = getNewUniqueFilepath(this.app.vault, filename, folderpath);
 		const file = await this.app.vault.create(fname, initData ?? this.getBlackData());
@@ -373,6 +306,7 @@ export default class ExcelPlugin extends Plugin {
 			return true;
 		}
 		const fileCache = f ? this.app.metadataCache.getFileCache(f) : null;
+		// console.log("isExcelFile", fileCache)
 		return (
 			!!fileCache?.frontmatter && !!fileCache?.frontmatter[FRONTMATTER_KEY]
 		);

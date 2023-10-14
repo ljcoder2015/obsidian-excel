@@ -110,8 +110,7 @@ export function getExcelFilename(settings: ExcelSettings): string {
  * Open or create a folderpath if it does not exist
  * @param folderpath
  */
-export async function checkAndCreateFolder(folderpath: string) {
-  const vault = app.vault;
+export async function checkAndCreateFolder(vault: Vault, folderpath: string) {
   folderpath = normalizePath(folderpath);
   //https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/658
   //@ts-ignore
