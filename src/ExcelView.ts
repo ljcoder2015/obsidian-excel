@@ -252,16 +252,17 @@ export class ExcelView extends TextFileView {
 		const eri = this.cellsSelected.eri || 0;
 		const eci = this.cellsSelected.eci || 0;
 
-		// console.log('data', data, sri, sci, eri, eci)
+		console.log('data', data, sri, sci, eri, eci)
 
 		var html = "<table>";
 
 		if (data) {
+			// 记录合并单元格数量
+			var mergeMap: Map<string, boolean> = new Map()
+
 			for (var row = sri; row <= eri; row++) {
 				html += "<tr>";
 				
-				// 记录合并单元格数量
-				var mergeMap = {}
 				for (var col = sci; col <= eci; col++) {
 					
 					// 获取当前行的数据
@@ -277,23 +278,37 @@ export class ExcelView extends TextFileView {
 								var mergeRow = cell.merge[0] + 1
 								var mergeCol = cell.merge[1] + 1
 
-								// 有合并行
-								// for(var r = 1; r < mergeRow; r ++) {
-								// 	const index = `${row + r}-${col}`
-								// 	mergeMap.index = true
-								// }
-	
-								html += `<td rowspan="${mergeRow}" colspan="${mergeCol}">${cell.text}</td>`;
+								// 记录合并的行跟列
+								for(var r = 0; r < mergeRow; r ++) {
+									const index = `${row + r}-${col}`
+									mergeMap.set(index, true)
+
+									for(var c = 0; c < mergeCol; c ++) {
+										const index = `${row + r}-${col + c}`
+										mergeMap.set(index, true)
+									}
+								}
+
+								html += `<td rowspan="${mergeRow}" colspan="${mergeCol}">${cell.text || ""}</td>`;
 							} else {
-								html += `<td>${cell.text}</td>`;
+								// 无合并单元格直接添加
+								html += `<td>${cell.text || ""}</td>`;
 							}
 						} else {
-							// 单元格没数据添加空白单元格
-							html += `<td></td>`;
+							// 添加空白单元格需要判断是否被合并了
+							const index = `${row}-${col}`
+							if (!mergeMap.get(index)) {
+								// 单元格没数据添加空白单元格 & 没有被合并单元格
+								html += `<td></td>`;	
+							}
 						}
 					} else {
-						// 整行都没数据
-						html += `<td></td>`;
+						const index = `${row}-${col}`
+						// 添加空白单元格需要判断是否被合并了
+						if (!mergeMap.get(index)) {
+								// 单元格没数据添加空白单元格 & 没有被合并单元格
+							html += `<td></td>`;
+						}
 					}
 				}
 

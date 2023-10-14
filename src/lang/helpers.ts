@@ -58,7 +58,7 @@ export function t(str: keyof typeof en): string {
     // TODO 
   }
 
-  console.log(moment.locale())
+  // console.log(moment.locale())
 
   return (locale && locale[str]) || en[str];
 }
