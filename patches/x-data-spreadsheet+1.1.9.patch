@@ -1,18 +1,17 @@
 diff --git a/node_modules/x-data-spreadsheet/src/component/event.js b/node_modules/x-data-spreadsheet/src/component/event.js
-index cdbc0fa..43149da 100644
+index cdbc0fa..cb2a9db 100644
 --- a/node_modules/x-data-spreadsheet/src/component/event.js
 +++ b/node_modules/x-data-spreadsheet/src/component/event.js
-@@ -74,6 +74,8 @@ export function bindTouch(target, { move, end }) {
+@@ -74,6 +74,7 @@ export function bindTouch(target, { move, end }) {
        starty = pageY;
      }
      evt.preventDefault();
 +    evt.stopPropagation();
-+    console.log("touchmove event", evt)
    });
    bind(target, 'touchend', (evt) => {
      if (!end) return;
 diff --git a/node_modules/x-data-spreadsheet/src/component/sheet.js b/node_modules/x-data-spreadsheet/src/component/sheet.js
-index 086b8c4..4c49755 100644
+index 086b8c4..cd01f6e 100644
 --- a/node_modules/x-data-spreadsheet/src/component/sheet.js
 +++ b/node_modules/x-data-spreadsheet/src/component/sheet.js
 @@ -77,11 +77,11 @@ function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
@@ -29,14 +28,6 @@ index 086b8c4..4c49755 100644
    }
    toolbar.reset();
    table.render();
-@@ -588,6 +588,7 @@ function sheetInitEvents() {
-   overlayerEl
-     .on('mousemove', (evt) => {
-       overlayerMousemove.call(this, evt);
-+      evt.stopPropagation()
-     })
-     .on('mousedown', (evt) => {
-       editor.clear();
 diff --git a/node_modules/x-data-spreadsheet/src/index.d.ts b/node_modules/x-data-spreadsheet/src/index.d.ts
 index 948a8e9..7fe36b3 100644
 --- a/node_modules/x-data-spreadsheet/src/index.d.ts
