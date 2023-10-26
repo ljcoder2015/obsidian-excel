@@ -1,5 +1,6 @@
 import { Notice } from "obsidian";
 import { t } from "../lang/helpers"
+import { expr2expr } from "../utils/alphabet"
 /**
  * 获取 sheet 数据
  * @param data markdown 文件原始data
@@ -32,19 +33,14 @@ export const getExcelAreaData = (
 	const excelData = getExcelData(data) || "{}";
 	const jsonData = JSON.parse(excelData) || [];
 
-	var sri: number | null = null;
-	var sci: number | null = null;
-	var eri: number | null = null;
-	var eci: number | null = null;
-
 	var cellArray = cells.split(":");
 	const start = cellArray[0].split("-");
-	sri = parseInt(start[0]); // 开始行
-	sci = parseInt(start[1]); // 开始列
+	var sri = parseInt(start[0]); // 开始行
+	var sci = parseInt(start[1]); // 开始列
 
 	const end = cellArray[1].split("-");
-	eri = parseInt(end[0]); // 结束行
-	eci = parseInt(end[1]); // 结束列
+	var eri = parseInt(end[0]); // 结束行
+	var eci = parseInt(end[1]); // 结束列
 
 	var newData = new Map<string, any>();
 	newData.set("name", sheet);
@@ -65,7 +61,7 @@ export const getExcelAreaData = (
 			for (var row = 0; row <= eri - sri; row++) {
 				// 获取原始 row 的数据
 				const rowsData = sheetData.rows[`${row + sri}`];
-				console.log("getExcelAreaData", sheetData, rowsData, row + eri);
+				// console.log("getExcelAreaData", sheetData, rowsData, row + eri);
 				var newCells = new Map<string, any>();
 				if (rowsData) {
 					var cellsData = new Map<string, any>();
@@ -74,6 +70,16 @@ export const getExcelAreaData = (
 						// 获取原始 当前 [row, col] 的数据
 						const cell = rowsData.cells[`${col + sci}`];
 						if (cell) {
+							// 如果当前cell是公式
+							if (cell.text) {
+								var text = cell.text as String
+								if (text && text[0] === '=') {
+									// console.log('cell text', text, sri, sci)
+									cell.text = text.replace(/[a-zA-Z]{1,3}\d+/g, word => expr2expr(word, -sci, -sri, (x, y) => x >= sci && y >= sri));
+									// console.log('update cell text', cell.text)
+								}
+							}
+
 							cellsData.set(`${col}`, cell);
 							// 是否有合并单元格的数据
 							if (row == eri - sri && cell.merge) {

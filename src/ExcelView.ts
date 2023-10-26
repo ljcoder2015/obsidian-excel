@@ -192,7 +192,7 @@ export class ExcelView extends TextFileView {
 			showBottomBar: true,
 			view: {
 				height: () => this.contentEl.clientHeight,
-				width: () => this.contentEl.clientWidth,
+				width: () => this.contentEl.clientWidth - 32,
 			},
 			row: {
 				len: 100,
