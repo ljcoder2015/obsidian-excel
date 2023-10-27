@@ -43,16 +43,19 @@ export const getExcelAreaData = (
 	var eci = parseInt(end[1]); // 结束列
 
 	var newData = new Map<string, any>();
-	newData.set("name", sheet);
-	newData.set("autofilter", {});
-	newData.set("freeze", "A1");
-	newData.set("styles", [{ "0": { bgcolor: "#fe0000" } }]);
-	newData.set("validations", []);
 
 	if (jsonData instanceof Array) {
 		const sheetData = jsonData.filter((item) => {
 			return item.name === sheet;
 		})[0];
+
+		newData.set("name", sheet);
+		newData.set("autofilter", sheetData.autofilter);
+		newData.set("freeze", sheetData.freeze);
+		newData.set("styles", sheetData.styles);
+		newData.set("validations", sheetData.validations);
+		newData.set("merges", sheetData.merges);
+
 		var rowLen = eri - sri + 1;
 		if (sheetData) {
 			// 用来存储新数据
@@ -75,7 +78,7 @@ export const getExcelAreaData = (
 								var text = cell.text as String
 								if (text && text[0] === '=') {
 									// console.log('cell text', text, sri, sci)
-									cell.text = text.replace(/[a-zA-Z]{1,3}\d+/g, word => expr2expr(word, -sci, -sri, (x, y) => x >= sci && y >= sri));
+									cell.text = text.replace(/[a-zA-Z]{1,3}\d+/g, word => expr2expr(word, -sci, -sri, (x, y) => true));
 									// console.log('update cell text', cell.text)
 								}
 							}

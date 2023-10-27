@@ -73,14 +73,14 @@ export function xy2expr(x, y) {
  * @date 2019-10-10
  * @export
  * @param {tagA1} src
- * @param {number} xn
- * @param {number} yn
+ * @param {number} xn 列坐标
+ * @param {number} yn 行坐标
  * @returns {tagA1}
  */
 export function expr2expr(src, xn, yn, condition = (x, y) => true) {
   if (xn === 0 && yn === 0) return src;
   const [x, y] = expr2xy(src);
-  // console.log('expr2xy', x, y ,src)
+  // console.log('expr2xy', x, y ,src, xn, yn)
   if (!condition(x, y)) return src;
   return xy2expr(x + xn, y + yn);
 }
