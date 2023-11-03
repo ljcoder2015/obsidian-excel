@@ -25,6 +25,8 @@ export default {
    
 
   // ExcelSettingTab.ts
+  BASE_COLOR: "Base color scheme",
+  BASE_COLOR_DESC: "Choose default color scheme",
   FILE_SETTING: "File Setting",
   FOLDER: "FOLDER",
   FOLDER_DESC: "Create files in this folder by default",

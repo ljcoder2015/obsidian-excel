@@ -24,6 +24,8 @@ export default {
    EXPORT_XLSX_FILE: "到处 xlsx 文件",
    
     // ExcelSettingTab.ts
+    BASE_COLOR: "基础颜色",
+    BASE_COLOR_DESC: "选择默认基础色",
     FILE_SETTING: "文件设置",
     FOLDER: "文件夹",
     FOLDER_DESC: "新建文件将放在此文件夹下",

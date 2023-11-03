@@ -11,7 +11,7 @@ index cdbc0fa..cb2a9db 100644
    bind(target, 'touchend', (evt) => {
      if (!end) return;
 diff --git a/node_modules/x-data-spreadsheet/src/component/sheet.js b/node_modules/x-data-spreadsheet/src/component/sheet.js
-index 086b8c4..cd01f6e 100644
+index 086b8c4..264823c 100644
 --- a/node_modules/x-data-spreadsheet/src/component/sheet.js
 +++ b/node_modules/x-data-spreadsheet/src/component/sheet.js
 @@ -77,11 +77,11 @@ function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
@@ -28,11 +28,179 @@ index 086b8c4..cd01f6e 100644
    }
    toolbar.reset();
    table.render();
+@@ -854,7 +854,7 @@ function sheetInitEvents() {
+ }
+ 
+ export default class Sheet {
+-  constructor(targetEl, data) {
++  constructor(targetEl, data, isDark) {
+     this.eventMap = createEventEmitter();
+     const { view, showToolbar, showContextmenu } = data.settings;
+     this.el = h('div', `${cssPrefix}-sheet`);
+@@ -904,7 +904,7 @@ export default class Sheet {
+       this.sortFilter.el,
+     );
+     // table
+-    this.table = new Table(this.tableEl.el, data);
++    this.table = new Table(this.tableEl.el, data, isDark);
+     sheetInitEvents.call(this);
+     sheetReset.call(this);
+     // init selector [0, 0]
+diff --git a/node_modules/x-data-spreadsheet/src/component/table.js b/node_modules/x-data-spreadsheet/src/component/table.js
+index 41e1e14..09ac678 100644
+--- a/node_modules/x-data-spreadsheet/src/component/table.js
++++ b/node_modules/x-data-spreadsheet/src/component/table.js
+@@ -7,22 +7,23 @@ import { formatm } from '../core/format';
+ import {
+   Draw, DrawBox, thinLineWidth, npx,
+ } from '../canvas/draw';
++import { idText } from 'typescript';
+ // gobal var
+ const cellPaddingWidth = 5;
+ const tableFixedHeaderCleanStyle = { fillStyle: '#f4f5f8' };
+-const tableGridStyle = {
++var tableGridStyle = {
+   fillStyle: '#fff',
+   lineWidth: thinLineWidth,
+   strokeStyle: '#e6e6e6',
+ };
+-function tableFixedHeaderStyle() {
++function tableFixedHeaderStyle(isDark) {
+   return {
+     textAlign: 'center',
+     textBaseline: 'middle',
+     font: `500 ${npx(12)}px Source Sans Pro`,
+-    fillStyle: '#585757',
++    fillStyle: isDark ? '#dcdcdc' : '#585757',
+     lineWidth: thinLineWidth(),
+-    strokeStyle: '#e6e6e6',
++    strokeStyle: isDark ? '#c0c0c0': '#e6e6e6',
+   };
+ }
+ 
+@@ -184,13 +185,18 @@ function renderSelectedHeaderCell(x, y, w, h) {
+ // h: the fixed height of header
+ // tx: moving distance on x-axis
+ // ty: moving distance on y-axis
+-function renderFixedHeaders(type, viewRange, w, h, tx, ty) {
++function renderFixedHeaders(type, viewRange, w, h, tx, ty, isDark) {
+   const { draw, data } = this;
+   const sumHeight = viewRange.h; // rows.sumHeight(viewRange.sri, viewRange.eri + 1);
+   const sumWidth = viewRange.w; // cols.sumWidth(viewRange.sci, viewRange.eci + 1);
+   const nty = ty + h;
+   const ntx = tx + w;
+ 
++  if (isDark) {
++    tableFixedHeaderCleanStyle.fillStyle = '#595d88'
++    tableFixedHeaderCleanStyle.strokeStyle = '#5d5d5d'
++  }
++
+   draw.save();
+   // draw rect background
+   draw.attr(tableFixedHeaderCleanStyle);
+@@ -203,7 +209,7 @@ function renderFixedHeaders(type, viewRange, w, h, tx, ty) {
+   // console.log(data.selectIndexes);
+   // draw text
+   // text font, align...
+-  draw.attr(tableFixedHeaderStyle());
++  draw.attr(tableFixedHeaderStyle(isDark));
+   // y-header-text
+   if (type === 'all' || type === 'left') {
+     data.rowEach(viewRange.sri, viewRange.eri, (i, y1, rowHeight) => {
+@@ -247,21 +253,25 @@ function renderFixedHeaders(type, viewRange, w, h, tx, ty) {
+   draw.restore();
+ }
+ 
+-function renderFixedLeftTopCell(fw, fh) {
++function renderFixedLeftTopCell(fw, fh, isDark) {
+   const { draw } = this;
+   draw.save();
+   // left-top-cell
+-  draw.attr({ fillStyle: '#f4f5f8' })
++  draw.attr({ fillStyle: isDark ? '#595d88' : '#f4f5f8', strokeStyle: isDark ? '#5d5d5d' : '#e6e6e6' })
+     .fillRect(0, 0, fw, fh);
+   draw.restore();
+ }
+ 
+ function renderContentGrid({
+   sri, sci, eri, eci, w, h,
+-}, fw, fh, tx, ty) {
++}, fw, fh, tx, ty, isDark) {
+   const { draw, data } = this;
+   const { settings } = data;
+ 
++  if (isDark) {
++    tableGridStyle.strokeStyle = '#5d5d5d'
++  }
++
+   draw.save();
+   draw.attr(tableGridStyle)
+     .translate(fw + tx, fh + ty);
+@@ -300,10 +310,11 @@ function renderFreezeHighlightLine(fw, fh, ftw, fth) {
+ 
+ /** end */
+ class Table {
+-  constructor(el, data) {
++  constructor(el, data, isDark) {
+     this.el = el;
+     this.draw = new Draw(el, data.viewWidth(), data.viewHeight());
+     this.data = data;
++    this.isDark = isDark
+   }
+ 
+   resetData(data) {
+@@ -329,10 +340,10 @@ class Table {
+     const ty = data.freezeTotalHeight();
+     const { x, y } = data.scroll;
+     // 1
+-    renderContentGrid.call(this, viewRange, fw, fh, tx, ty);
++    renderContentGrid.call(this, viewRange, fw, fh, tx, ty, this.isDark);
+     renderContent.call(this, viewRange, fw, fh, -x, -y);
+-    renderFixedHeaders.call(this, 'all', viewRange, fw, fh, tx, ty);
+-    renderFixedLeftTopCell.call(this, fw, fh);
++    renderFixedHeaders.call(this, 'all', viewRange, fw, fh, tx, ty, this.isDark);
++    renderFixedLeftTopCell.call(this, fw, fh, this.isDark);
+     const [fri, fci] = data.freeze;
+     if (fri > 0 || fci > 0) {
+       // 2
+@@ -343,7 +354,7 @@ class Table {
+         vr.h = ty;
+         renderContentGrid.call(this, vr, fw, fh, tx, 0);
+         renderContent.call(this, vr, fw, fh, -x, 0);
+-        renderFixedHeaders.call(this, 'top', vr, fw, fh, tx, 0);
++        renderFixedHeaders.call(this, 'top', vr, fw, fh, tx, 0, this.isDark);
+       }
+       // 3
+       if (fci > 0) {
+@@ -352,13 +363,13 @@ class Table {
+         vr.eci = fci - 1;
+         vr.w = tx;
+         renderContentGrid.call(this, vr, fw, fh, 0, ty);
+-        renderFixedHeaders.call(this, 'left', vr, fw, fh, 0, ty);
++        renderFixedHeaders.call(this, 'left', vr, fw, fh, 0, ty, this.isDark);
+         renderContent.call(this, vr, fw, fh, 0, -y);
+       }
+       // 4
+       const freezeViewRange = data.freezeViewRange();
+       renderContentGrid.call(this, freezeViewRange, fw, fh, 0, 0);
+-      renderFixedHeaders.call(this, 'all', freezeViewRange, fw, fh, 0, 0);
++      renderFixedHeaders.call(this, 'all', freezeViewRange, fw, fh, 0, 0, this.isDark);
+       renderContent.call(this, freezeViewRange, fw, fh, 0, 0);
+       // 5
+       renderFreezeHighlightLine.call(this, fw, fh, tx, ty);
 diff --git a/node_modules/x-data-spreadsheet/src/index.d.ts b/node_modules/x-data-spreadsheet/src/index.d.ts
-index 948a8e9..7fe36b3 100644
+index 948a8e9..72fb91e 100644
 --- a/node_modules/x-data-spreadsheet/src/index.d.ts
 +++ b/node_modules/x-data-spreadsheet/src/index.d.ts
-@@ -45,18 +45,18 @@ declare module 'x-data-spreadsheet' {
+@@ -34,6 +34,7 @@ declare module 'x-data-spreadsheet' {
+         italic: false;
+       };
+     };
++    isDark: boolean;
+   }
+ 
+   export type CELL_SELECTED = 'cell-selected';
+@@ -45,18 +46,18 @@ declare module 'x-data-spreadsheet' {
    export interface SpreadsheetEventHandler {
      (
        envt: CELL_SELECTED,
@@ -54,7 +222,7 @@ index 948a8e9..7fe36b3 100644
      ): void;
    }
  
-@@ -182,6 +182,19 @@ declare module 'x-data-spreadsheet' {
+@@ -182,6 +183,19 @@ declare module 'x-data-spreadsheet' {
       * @param callback
       */
      change(callback: (json: Record<string, any>) => void): this;
@@ -75,9 +243,18 @@ index 948a8e9..7fe36b3 100644
       * set locale
       * @param lang
 diff --git a/node_modules/x-data-spreadsheet/src/index.js b/node_modules/x-data-spreadsheet/src/index.js
-index 479a0b7..96d0f3a 100644
+index 479a0b7..ae82d34 100644
 --- a/node_modules/x-data-spreadsheet/src/index.js
 +++ b/node_modules/x-data-spreadsheet/src/index.js
+@@ -11,7 +11,7 @@ import './index.less';
+ class Spreadsheet {
+   constructor(selectors, options = {}) {
+     let targetEl = selectors;
+-    this.options = { showBottomBar: true, ...options };
++    this.options = { isDark: false, showBottomBar: true, ...options };
+     this.sheetIndex = 1;
+     this.datas = [];
+     if (typeof selectors === 'string') {
 @@ -20,6 +20,7 @@ class Spreadsheet {
      this.bottombar = this.options.showBottomBar ? new Bottombar(() => {
        const d = this.addSheet();
@@ -86,7 +263,7 @@ index 479a0b7..96d0f3a 100644
      }, (index) => {
        const d = this.datas[index];
        this.sheet.resetData(d);
-@@ -27,6 +28,7 @@ class Spreadsheet {
+@@ -27,13 +28,14 @@ class Spreadsheet {
        this.deleteSheet();
      }, (index, value) => {
        this.datas[index].name = value;
@@ -94,6 +271,14 @@ index 479a0b7..96d0f3a 100644
      }) : null;
      this.data = this.addSheet();
      const rootEl = h('div', `${cssPrefix}`)
+       .on('contextmenu', evt => evt.preventDefault());
+     // create canvas element
+     targetEl.appendChild(rootEl.el);
+-    this.sheet = new Sheet(rootEl, this.data);
++    this.sheet = new Sheet(rootEl, this.data, options.isDark);
+     if (this.bottombar !== null) {
+       rootEl.child(this.bottombar.el);
+     }
 @@ -120,6 +122,16 @@ class Spreadsheet {
      return this;
    }

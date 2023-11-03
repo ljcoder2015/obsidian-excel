@@ -8,6 +8,7 @@ import { getExcelData } from "./utils/DataUtils";
 import zhCn from "./lang/locale/sheet-zh-cn"
 import en from "./lang/locale/sheet-en"
 import { t } from "./lang/helpers"
+import { updateSheetTheme } from "./utils/ThemeUtils";
 
 export class ExcelView extends TextFileView {
 	public plugin: ExcelPlugin;
@@ -186,6 +187,41 @@ export class ExcelView extends TextFileView {
 		} else {
 			Spreadsheet.locale('en', en)
 		}
+
+		// 设置 sheet 样式
+		var style = {
+			bgcolor: '#ffffff',
+			align: 'left',
+			valign: 'middle',
+			textwrap: false,
+			strike: false,
+			underline: false,
+			color: '#0a0a0a',
+			font: {
+			  name: 'Helvetica',
+			  size: 10,
+			  bold: false,
+			  italic: false,
+			},
+		}
+
+		if (this.plugin.settings.theme === "dark") {
+			style = {
+				bgcolor: '#363636',
+				align: 'left',
+				valign: 'middle',
+				textwrap: false,
+				strike: false,
+				underline: false,
+				color: '#fff',
+				font: {
+				  name: 'Helvetica',
+				  size: 10,
+				  bold: false,
+				  italic: false,
+				},
+			}
+		}
 		
 		//@ts-ignore
 		this.sheet = new Spreadsheet(this.sheetEle, {
@@ -204,6 +240,9 @@ export class ExcelView extends TextFileView {
 				indexWidth: 60,
 				minWidth: 60,
 			},
+			//@ts-ignore
+			style: style,
+			isDark: this.plugin.settings.theme === "dark"
 		})
 			.loadData(jsonData) // load data
 			.change(() => {
@@ -240,6 +279,8 @@ export class ExcelView extends TextFileView {
 			this.cellsSelected.eri = ri;
 			this.cellsSelected.eci = ci;
 		});
+
+		updateSheetTheme(this.plugin.settings.theme === "dark")
 
 		// @ts-ignore
 		this.sheet.validate();

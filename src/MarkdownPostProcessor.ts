@@ -7,6 +7,7 @@ import {
 import ExcelPlugin from "./main";
 import Spreadsheet from "x-data-spreadsheet";
 import { getExcelData, getExcelAreaData } from "./utils/DataUtils";
+import { updateSheetTheme } from "./utils/ThemeUtils";
 
 let plugin: ExcelPlugin;
 let vault: Vault;
@@ -179,6 +180,42 @@ const createSheetEl = (data: string, file: TFile, width: number, height: number 
 
 	const jsonData = JSON.parse(data || "{}") || {};
 	// console.log("createSheetEl", jsonData, data)
+
+	// 设置 sheet 样式
+	var style = {
+		bgcolor: '#ffffff',
+		align: 'left',
+		valign: 'middle',
+		textwrap: false,
+		strike: false,
+		underline: false,
+		color: '#0a0a0a',
+		font: {
+		  name: 'Helvetica',
+		  size: 10,
+		  bold: false,
+		  italic: false,
+		},
+	}
+
+	if (plugin.settings.theme === "dark") {
+		style = {
+			bgcolor: '#363636',
+			align: 'left',
+			valign: 'middle',
+			textwrap: false,
+			strike: false,
+			underline: false,
+			color: '#fff',
+			font: {
+			  name: 'Helvetica',
+			  size: 10,
+			  bold: false,
+			  italic: false,
+			},
+		}
+	}
+
 	//@ts-ignore
 	const sheet = new Spreadsheet(sheetEl, {
 		mode: "read",
@@ -186,7 +223,7 @@ const createSheetEl = (data: string, file: TFile, width: number, height: number 
 		showBottomBar: true,
 		view: {
 			height: () => height,
-			width: () => width,
+			width: () => width - 10,
 		},
 		row: {
 			len: 100,
@@ -198,7 +235,12 @@ const createSheetEl = (data: string, file: TFile, width: number, height: number 
 			indexWidth: 60,
 			minWidth: 60,
 		},
+		// @ts-ignore
+		style: style,
+		isDark: plugin.settings.theme === "dark",
 	}).loadData(jsonData); // load data
+
+	updateSheetTheme(plugin.settings.theme === "dark")
 
 	// @ts-ignore
 	sheet.validate();

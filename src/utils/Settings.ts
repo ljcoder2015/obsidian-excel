@@ -4,7 +4,8 @@ export interface ExcelSettings {
 	excelFilenameDateTime: string,
 	sheetHeight: string,
 	rowHeight: string,
-	colWidth: string
+	colWidth: string,
+	theme: string
 }
 
 export const DEFAULT_SETTINGS: ExcelSettings = {
@@ -13,5 +14,6 @@ export const DEFAULT_SETTINGS: ExcelSettings = {
 	excelFilenameDateTime: "YYYY-MM-DD HH.mm.ss",
 	sheetHeight: "300",
 	rowHeight: "25",
-	colWidth: "100"
+	colWidth: "100",
+	theme: "light"
 };
