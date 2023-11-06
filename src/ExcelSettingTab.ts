@@ -27,6 +27,7 @@ export class ExcelSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.theme)
                 .onChange(async (value) => {
                     this.plugin.settings.theme = value
+                    this.plugin.saveSettings()
                 }),
             );
 

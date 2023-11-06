@@ -260,6 +260,11 @@ export class ExcelView extends TextFileView {
 				const data = this.sheet.getData();
 				// console.log('onRenameSheet', data)
 				this.saveData(JSON.stringify(data));
+			})
+			.onDeleteSheet(() => {
+				const data = this.sheet.getData();
+				// console.log('onDeleteSheet', data)
+				this.saveData(JSON.stringify(data));
 			});
 
 		this.sheet.on("cells-selected", (sheetData, { sri, sci, eri, eci }) => {
