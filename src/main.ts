@@ -143,7 +143,7 @@ export default class ExcelPlugin extends Plugin {
 
 	private registerMonkeyPatches() {
 		const key =
-			"https://github.com/zsviczian/obsidian-excalidraw-plugin/issues";
+			"https://github.com/ljcoder2015/obsidian-excel";
 		this.register(
 			around(Workspace.prototype, {
 				getActiveViewOfType(old) {

@@ -21,7 +21,7 @@ export default {
    PLEASE_SELECT_DATA: "请选择要拷贝的数据",
 
    IMPORT_XLSX_FILE: "导入 xlsx 文件",
-   EXPORT_XLSX_FILE: "到处 xlsx 文件",
+   EXPORT_XLSX_FILE: "导出 xlsx 文件",
    
     // ExcelSettingTab.ts
     BASE_COLOR: "基础颜色",
