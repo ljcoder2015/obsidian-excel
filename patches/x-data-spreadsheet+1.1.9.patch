@@ -189,7 +189,7 @@ index 41e1e14..09ac678 100644
        // 5
        renderFreezeHighlightLine.call(this, fw, fh, tx, ty);
 diff --git a/node_modules/x-data-spreadsheet/src/index.d.ts b/node_modules/x-data-spreadsheet/src/index.d.ts
-index 948a8e9..72fb91e 100644
+index 948a8e9..7c99ef0 100644
 --- a/node_modules/x-data-spreadsheet/src/index.d.ts
 +++ b/node_modules/x-data-spreadsheet/src/index.d.ts
 @@ -34,6 +34,7 @@ declare module 'x-data-spreadsheet' {
@@ -222,7 +222,7 @@ index 948a8e9..72fb91e 100644
      ): void;
    }
  
-@@ -182,6 +183,19 @@ declare module 'x-data-spreadsheet' {
+@@ -182,6 +183,25 @@ declare module 'x-data-spreadsheet' {
       * @param callback
       */
      change(callback: (json: Record<string, any>) => void): this;
@@ -239,22 +239,30 @@ index 948a8e9..72fb91e 100644
 +     */
 +     onRenameSheet(callback: () => void): this;
 +
++     /**
++     * 删除Sheet
++     * @param callback
++     */
++     onDeleteSheet(callback: () => void): this;
++
      /**
       * set locale
       * @param lang
 diff --git a/node_modules/x-data-spreadsheet/src/index.js b/node_modules/x-data-spreadsheet/src/index.js
-index 479a0b7..ae82d34 100644
+index 479a0b7..165880e 100644
 --- a/node_modules/x-data-spreadsheet/src/index.js
 +++ b/node_modules/x-data-spreadsheet/src/index.js
-@@ -11,7 +11,7 @@ import './index.less';
+@@ -11,8 +11,8 @@ import './index.less';
  class Spreadsheet {
    constructor(selectors, options = {}) {
      let targetEl = selectors;
 -    this.options = { showBottomBar: true, ...options };
+-    this.sheetIndex = 1;
 +    this.options = { isDark: false, showBottomBar: true, ...options };
-     this.sheetIndex = 1;
++    this.sheetIndex = 0;
      this.datas = [];
      if (typeof selectors === 'string') {
+       targetEl = document.querySelector(selectors);
 @@ -20,6 +20,7 @@ class Spreadsheet {
      this.bottombar = this.options.showBottomBar ? new Bottombar(() => {
        const d = this.addSheet();
@@ -279,7 +287,15 @@ index 479a0b7..ae82d34 100644
      if (this.bottombar !== null) {
        rootEl.child(this.bottombar.el);
      }
-@@ -120,6 +122,16 @@ class Spreadsheet {
+@@ -60,6 +62,7 @@ class Spreadsheet {
+     const [oldIndex, nindex] = this.bottombar.deleteItem();
+     if (oldIndex >= 0) {
+       this.datas.splice(oldIndex, 1);
++      this.sheet.trigger('delete-sheet', "")
+       if (nindex >= 0) this.sheet.resetData(this.datas[nindex]);
+     }
+   }
+@@ -120,6 +123,21 @@ class Spreadsheet {
      return this;
    }
  
@@ -291,6 +307,11 @@ index 479a0b7..ae82d34 100644
 +  onRenameSheet(cb) {
 +    this.sheet.on('rename-sheet', cb);
 +    return this;
++  }
++
++  onDeleteSheet(cb) {
++    this.sheet.on('delete-sheet', cb)
++    return this
 +  }
 +
    static locale(lang, message) {

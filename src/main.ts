@@ -135,10 +135,17 @@ export default class ExcelPlugin extends Plugin {
 			});
 		  };
 	  
-		  this.registerEvent(
-			this.app.workspace.on("file-menu", fileMenuHandlerCreateNew),
-		  );
-	  
+		this.registerEvent(
+		this.app.workspace.on("file-menu", fileMenuHandlerCreateNew),
+		);
+
+		this.addCommand({
+			id: "excel-autocreate",
+			name: t("CREATE_EXCEL"),
+			callback: () => {
+				this.createAndOpenExcel(getExcelFilename(this.settings), undefined, this.getBlackData());
+			},
+		  });
 	}
 
 	private registerMonkeyPatches() {
