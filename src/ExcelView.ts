@@ -213,7 +213,7 @@ export class ExcelView extends TextFileView {
 				textwrap: false,
 				strike: false,
 				underline: false,
-				color: '#fff',
+				color: '#e6e6e6',
 				font: {
 				  name: 'Helvetica',
 				  size: 10,
