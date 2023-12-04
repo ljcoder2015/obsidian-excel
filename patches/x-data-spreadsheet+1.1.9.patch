@@ -11,7 +11,7 @@ index cdbc0fa..cb2a9db 100644
    bind(target, 'touchend', (evt) => {
      if (!end) return;
 diff --git a/node_modules/x-data-spreadsheet/src/component/sheet.js b/node_modules/x-data-spreadsheet/src/component/sheet.js
-index 086b8c4..264823c 100644
+index 086b8c4..6757389 100644
 --- a/node_modules/x-data-spreadsheet/src/component/sheet.js
 +++ b/node_modules/x-data-spreadsheet/src/component/sheet.js
 @@ -77,11 +77,11 @@ function selectorSet(multiple, ri, ci, indexesUpdated = true, moving = false) {
@@ -28,6 +28,33 @@ index 086b8c4..264823c 100644
    }
    toolbar.reset();
    table.render();
+@@ -467,7 +467,7 @@ function horizontalScrollbarMove(distance) {
+ function rowResizerFinished(cRect, distance) {
+   const { ri } = cRect;
+   const { table, selector, data } = this;
+-  data.rows.setHeight(ri, distance);
++  data.setRowHeight(ri, distance);
+   table.render();
+   selector.resetAreaOffset();
+   verticalScrollbarSet.call(this);
+@@ -477,7 +477,7 @@ function rowResizerFinished(cRect, distance) {
+ function colResizerFinished(cRect, distance) {
+   const { ci } = cRect;
+   const { table, selector, data } = this;
+-  data.cols.setWidth(ci, distance);
++  data.setColWidth(ci, distance);
+   // console.log('data:', data);
+   table.render();
+   selector.resetAreaOffset();
+@@ -785,7 +785,7 @@ function sheetInitEvents() {
+           break;
+       }
+     } else {
+-      // console.log('evt.keyCode:', evt.keyCode);
++      console.log('evt.keyCode:', evt.keyCode);
+       switch (keyCode) {
+         case 32:
+           if (shiftKey) {
 @@ -854,7 +854,7 @@ function sheetInitEvents() {
  }
  
