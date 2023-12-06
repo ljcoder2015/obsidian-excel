@@ -6,8 +6,13 @@ import {
 } from "obsidian";
 import ExcelPlugin from "./main";
 import Spreadsheet from "x-data-spreadsheet";
-import { getExcelData, getExcelAreaData } from "./utils/DataUtils";
+import {
+	getExcelData,
+	getExcelAreaData,
+	getExcelAreaHtml,
+} from "./utils/DataUtils";
 import { updateSheetTheme } from "./utils/ThemeUtils";
+import da from "./lang/locale/da";
 
 let plugin: ExcelPlugin;
 let vault: Vault;
@@ -81,26 +86,45 @@ const tmpObsidianWYSIWYG = async (
 		internalEmbedDiv.empty();
 
 		const data = await vault.read(file);
-		const src = internalEmbedDiv.getAttribute("src") ?? "";
-		const alt = internalEmbedDiv.getAttribute("alt") ?? "";
+		var src = internalEmbedDiv.getAttribute("src") ?? "";
+		// 是否转换成HTML
+		var toHTML = false;
+		if (src.includes("{html}")) {
+			toHTML = true;
+			src = src.replace("{html}", "");
+		}
+
+		alt = internalEmbedDiv.getAttribute("alt") ?? "";
+		if (alt.includes("{html}")) {
+			// 单 sheet 中的某一区域
+			toHTML = true;
+			alt = alt.replace("{html}", "");
+		}
+
 		const split = src.split("#");
 		var excelData = getExcelData(data);
 		if (split.length > 1) {
-			excelData = getExcelAreaData(
-				data,
-				split[1],
-				alt
+			excelData = getExcelAreaData(data, split[1], alt);
+		}
+		
+		// 生成内容
+		if (toHTML) {
+			const table = createEditSheetHtml(data, file, split[1], alt)
+			internalEmbedDiv.appendChild(table);
+		} else {
+			const sheetDiv = createSheetEl(
+				excelData,
+				file,
+				internalEmbedDiv.clientWidth
 			);
+			internalEmbedDiv.appendChild(sheetDiv);
 		}
 
-		const sheetDiv = createSheetEl(excelData, file, internalEmbedDiv.clientWidth);
 		if (markdownEmbed) {
 			//display image on canvas without markdown frame
 			internalEmbedDiv.removeClass("markdown-embed");
 			internalEmbedDiv.removeClass("inline-embed");
 		}
-		internalEmbedDiv.appendChild(sheetDiv);
-		// console.log('internalEmbedDiv', internalEmbedDiv, markdownEmbed)
 	}
 
 	el.empty();
@@ -113,44 +137,163 @@ const tmpObsidianWYSIWYG = async (
 	internalEmbedDiv.empty();
 
 	const data = await vault.read(file);
-	const src = internalEmbedDiv.getAttribute("src") ?? "";
-	const alt = internalEmbedDiv.getAttribute("alt") ?? "";
-	var range = alt
+	var src = internalEmbedDiv.getAttribute("src") ?? "";
 
-	var heigh = parseInt(plugin.settings.sheetHeight)
+	// 是否转换成HTML
+	var toHTML = false;
+	if (src.includes("{html}")) {
+		// 单 sheet 
+		toHTML = true;
+		src = src.replace("{html}", "");
+	}
+
+	var alt = internalEmbedDiv.getAttribute("alt") ?? "";
+	if (alt.includes("{html}")) {
+		// 单 sheet 中的某一区域
+		toHTML = true;
+		alt = alt.replace("{html}", "");
+	}
+
+	var heigh = parseInt(plugin.settings.sheetHeight);
 	const matchResult = alt.match(/<(\d+)>/);
 
 	if (matchResult && matchResult.length > 1) {
-	  const extractedValue = matchResult[1];  // 获取匹配到的数字
-	//   console.log("Extracted value:", extractedValue);
-	  heigh = parseInt(extractedValue)
-	  range = range.replace(/<\d+>/, '');
+		const extractedValue = matchResult[1]; // 获取匹配到的数字
+		//   console.log("Extracted value:", extractedValue);
+		heigh = parseInt(extractedValue);
+		alt = alt.replace(/<\d+>/, "");
 	} else {
-	//   console.log("No match found.");
+		//   console.log("No match found.");
 	}
+
 	const split = src.split("#");
 	var excelData = getExcelData(data);
 	if (split.length > 1) {
-		excelData = getExcelAreaData(
-			data,
-			split[1],
-			range
-		);
+		excelData = getExcelAreaData(data, split[1], alt);
 	}
 
 	// console.log('internalEmbedDiv', excelData, src, alt)
-	const sheetDiv = createSheetEl(excelData, file, internalEmbedDiv.clientWidth, heigh);
+	if (toHTML) {
+		const table = createEditSheetHtml(data, file, split[1], alt)
+		internalEmbedDiv.appendChild(table);
+	} else {
+		const sheetDiv = createSheetEl(
+			excelData,
+			file,
+			internalEmbedDiv.clientWidth,
+			heigh
+		);
+		internalEmbedDiv.appendChild(sheetDiv);
+	}
 	if (markdownEmbed) {
 		//display image on canvas without markdown frame
 		internalEmbedDiv.removeClass("markdown-embed");
 		internalEmbedDiv.removeClass("inline-embed");
 	}
-	internalEmbedDiv.appendChild(sheetDiv);
 };
 
-const createSheetEl = (data: string, file: TFile, width: number, height: number = 300): HTMLDivElement => {
 
-	const sheetDiv = createDiv()
+/**
+ * 编辑模式下转换成 HTML 显示
+ * @param data markdown 文件原始data
+ * @param sheet sheet 名称
+ * @param cells 选中的cells 格式为: sri-sci:eri-eci 例如 6-6:7-8
+ * @returns
+ */
+const createEditSheetHtml = (
+	excelData: string,
+	file: TFile,
+	sheet: string,
+	cells: string
+): HTMLDivElement => {
+	const sheetDiv = createDiv();
+	
+	// <div class="internal-embed file-embed mod-generic is-loaded" tabindex="-1" src="Excel 2023-09-07 17.18.19.sheet" alt="Excel 2023-09-07 17.18.19.sheet" contenteditable="false"><div class="file-embed-title"><span class="file-embed-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-file"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></span> Excel 2023-09-07 17.18.19.sheet</div></div>
+	const fileEmbed = sheetDiv.createDiv({
+		cls: "internal-embed file-embed mod-generic is-loaded",
+		text: file.basename,
+		attr: {
+			src: file.basename,
+			alt: file.basename,
+			contenteditable: false,
+			tabindex: -1,
+		},
+	});
+
+	// 点击按钮打开 sheet
+	fileEmbed.onClickEvent((e) => {
+		e.stopPropagation();
+		plugin.app.workspace.getLeaf().openFile(file);
+	});
+
+	var table = getExcelAreaHtml(excelData, sheet, cells);
+		
+	var div = createDiv({
+		cls: "sheet-html",
+		attr: {
+			tabindex: "-1",
+			contenteditable: "false"
+		}
+	})
+	div.appendChild(table)
+	sheetDiv.appendChild(div);
+	return sheetDiv;
+};
+
+/**
+ * 预览模式下转换成 HTML 显示
+ * @param data markdown 文件原始data
+ * @param sheet sheet 名称
+ * @param cells 选中的cells 格式为: sri-sci:eri-eci 例如 6-6:7-8
+ * @returns
+ */
+const createSheetHtml = (
+	data: string,
+	file: TFile,
+	sheet: string,
+	cells: string
+): HTMLDivElement => {
+	const sheetDiv = createDiv();
+
+	const fileEmbed = sheetDiv.createDiv({
+		cls: "internal-embed file-embed mod-generic is-loaded",
+		text: file.basename,
+		attr: {
+			src: file.basename,
+			alt: file.basename,
+			contenteditable: false,
+			tabindex: -1,
+		},
+	});
+
+	// 点击按钮打开 sheet
+	fileEmbed.onClickEvent((e) => {
+		e.stopPropagation();
+		plugin.app.workspace.getLeaf().openFile(file);
+	});
+
+	const sheetEl = createDiv({
+		attr: {
+			style: "overflow-x: auto;"
+		},
+	});
+
+	const table = getExcelAreaHtml(data, sheet, cells);
+	sheetEl.appendChild(table);
+	sheetDiv.appendChild(sheetEl);
+	return sheetDiv;
+};
+
+/**
+ *  bembed link 显示
+ */
+const createSheetEl = (
+	data: string,
+	file: TFile,
+	width: number,
+	height: number = 300
+): HTMLDivElement => {
+	const sheetDiv = createDiv();
 
 	// <div class="internal-embed file-embed mod-generic is-loaded" tabindex="-1" src="Excel 2023-09-07 17.18.19.sheet" alt="Excel 2023-09-07 17.18.19.sheet" contenteditable="false"><div class="file-embed-title"><span class="file-embed-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-file"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></span> Excel 2023-09-07 17.18.19.sheet</div></div>
 	const fileEmbed = sheetDiv.createDiv({
@@ -160,21 +303,21 @@ const createSheetEl = (data: string, file: TFile, width: number, height: number 
 			src: file.basename,
 			alt: file.basename,
 			contenteditable: false,
-			tabindex: -1
-		}
-	})
+			tabindex: -1,
+		},
+	});
 
-	// 点击按钮打开 sheet 
+	// 点击按钮打开 sheet
 	fileEmbed.onClickEvent((e) => {
-		e.stopPropagation()
-		plugin.app.workspace.getLeaf().openFile(file)
-	})
-	
+		e.stopPropagation();
+		plugin.app.workspace.getLeaf().openFile(file);
+	});
+
 	const sheetEl = createDiv({
 		cls: "sheet-iframe",
 		attr: {
 			id: `x-spreadsheet-${new Date().getTime()}`,
-			style: `height: ${height}px`
+			style: `height: ${height}px`,
 		},
 	});
 
@@ -183,37 +326,37 @@ const createSheetEl = (data: string, file: TFile, width: number, height: number 
 
 	// 设置 sheet 样式
 	var style = {
-		bgcolor: '#ffffff',
-		align: 'left',
-		valign: 'middle',
+		bgcolor: "#ffffff",
+		align: "left",
+		valign: "middle",
 		textwrap: false,
 		strike: false,
 		underline: false,
-		color: '#0a0a0a',
+		color: "#0a0a0a",
 		font: {
-		  name: 'Helvetica',
-		  size: 10,
-		  bold: false,
-		  italic: false,
+			name: "Helvetica",
+			size: 10,
+			bold: false,
+			italic: false,
 		},
-	}
+	};
 
 	if (plugin.settings.theme === "dark") {
 		style = {
-			bgcolor: '#363636',
-			align: 'left',
-			valign: 'middle',
+			bgcolor: "#363636",
+			align: "left",
+			valign: "middle",
 			textwrap: false,
 			strike: false,
 			underline: false,
-			color: '#e6e6e6',
+			color: "#e6e6e6",
 			font: {
-			  name: 'Helvetica',
-			  size: 10,
-			  bold: false,
-			  italic: false,
+				name: "Helvetica",
+				size: 10,
+				bold: false,
+				italic: false,
 			},
-		}
+		};
 	}
 
 	//@ts-ignore
@@ -240,11 +383,11 @@ const createSheetEl = (data: string, file: TFile, width: number, height: number 
 		isDark: plugin.settings.theme === "dark",
 	}).loadData(jsonData); // load data
 
-	updateSheetTheme(plugin.settings.theme === "dark")
+	updateSheetTheme(plugin.settings.theme === "dark");
 
 	// @ts-ignore
 	sheet.validate();
-	sheetDiv.appendChild(sheetEl)
+	sheetDiv.appendChild(sheetEl);
 	return sheetDiv;
 };
 
@@ -304,7 +447,7 @@ const processInternalEmbed = async (
 	internalEmbedEl: Element,
 	file: TFile
 ): Promise<HTMLDivElement> => {
-	const src = internalEmbedEl.getAttribute("src");
+	var src = internalEmbedEl.getAttribute("src");
 	//@ts-ignore
 	if (!src) return;
 
@@ -314,16 +457,36 @@ const processInternalEmbed = async (
 
 	const data = await vault.read(file);
 
-	const alt = internalEmbedEl.getAttribute("alt") ?? "";
+	
+	// 是否转换成HTML
+	var toHTML = false;
+	if (src.includes("{html}")) {
+		toHTML = true;
+		src = src.replace("{html}", "");
+	}
+
+	var alt = internalEmbedEl.getAttribute("alt") ?? "";
+	if (alt.includes("{html}")) {
+		// 单 sheet 中的某一区域
+		toHTML = true;
+		alt = alt.replace("{html}", "");
+	}
+	
 	const split = src.split("#");
 	var excelData = getExcelData(data);
 	if (split.length > 1) {
-		excelData = getExcelAreaData(
-			data,
-			split[1],
-			alt
-		);
+		excelData = getExcelAreaData(data, split[1], alt);
 	}
 
-	return await createSheetEl(excelData, file, internalEmbedEl.clientWidth);
+
+	// console.log('internalEmbedDiv', excelData, src, alt, toHTML)
+	if (toHTML) {
+		return await createSheetHtml(data, file, split[1], alt);
+	} else {
+		return await createSheetEl(
+			excelData,
+			file,
+			internalEmbedEl.clientWidth
+		);
+	}
 };

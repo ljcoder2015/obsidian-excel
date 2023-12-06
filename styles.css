@@ -12,6 +12,26 @@
 	--sheet-checked-before: #4b89ff;
 }
 
+.sheet-html {
+	overflow-x: auto;
+}
+
+.sheet-html table {
+    border-collapse: collapse;
+    line-height: var(--table-line-height);
+}
+
+.sheet-html td, .sheet-html th {
+    padding: var(--size-2-2) var(--size-4-2);
+    border: var(--table-border-width) solid var(--table-border-color);
+    max-width: var(--table-column-max-width);
+}
+
+.sheet-html td {
+    font-size: var(--table-text-size);
+    color: var(--table-text-color);
+}
+
 .sheet-box {
 	width: 100%;
 	height: 100%;

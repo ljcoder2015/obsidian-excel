@@ -15,7 +15,15 @@ If you are using Microsoft Office 365 to create xlsx files, you need to import t
 
 embed link rule:
 
-> ![[`file-folder`/`file-name`#`sheet-name`|`sri`-`sci`:`eri`-`eci`<`sheet-height`>]]
+```![[file-folder/file-name#sheet-name|sri-sci:eri-eci<sheet-height>{html}]]```
+
+- `sri`: Start row index
+- `eri`: End row index
+- `sci`: Start column index
+- `eci`: End column index
+- `{html}`: Whether to display as HTML
+- `<sheet-height>`: Sheet height, dispaly HTML not work
+
 
 ![link](./doc/img/link.gif)
 
