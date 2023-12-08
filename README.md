@@ -31,6 +31,8 @@ embed link rule:
 
 ![link](./doc//img/embed-link-height.gif)
 
+![link](./doc//img/embed_html.gif)
+
 ### copy selected cells to HTML
 
 ![html](./doc/img/html.gif)

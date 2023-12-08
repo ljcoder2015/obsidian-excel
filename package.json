@@ -6,8 +6,7 @@
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"version": "node version-bump.mjs && git add manifest.json versions.json",
-		"postinstall": "patch-package"
+		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
 	"keywords": [],
 	"author": "",
@@ -24,13 +23,12 @@
 		"esbuild": "0.17.3",
 		"esbuild-plugin-less": "^1.2.4",
 		"obsidian": "latest",
-		"patch-package": "^8.0.0",
 		"tslib": "2.4.0",
 		"typescript": "4.7.4"
 	},
 	"dependencies": {
 		"monkey-around": "^2.3.0",
-		"x-data-spreadsheet": "^1.1.9",
+		"x-data-spreadsheet": "git+ssh://git@github.com:ljcoder2015/x-spreadsheet.git#1.0.0",
 		"xlsx": "https://cdn.sheetjs.com/xlsx-0.20.0/xlsx-0.20.0.tgz"
 	}
 }
