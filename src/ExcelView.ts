@@ -1,5 +1,5 @@
 import ExcelPlugin from "src/main";
-import { TextFileView, WorkspaceLeaf, Platform, Notice, moment } from "obsidian";
+import { TextFileView, WorkspaceLeaf, Platform, Notice, moment, TFile } from "obsidian";
 import Spreadsheet from "x-data-spreadsheet";
 import * as XLSX from "xlsx";
 import { stox, xtos } from "./utils/xlsxspread";
@@ -49,6 +49,13 @@ export class ExcelView extends TextFileView {
 	saveData(data: string) {
 		this.data = this.headerData() + data;
 		// console.log("saveData", this.data)
+		this.save(false)
+			.then(() => {
+				// console.log("save data success", this.file)
+			})
+			.catch((e) => {
+				console.log("save data error", e)
+			})
 	}
 
 	clear(): void {
@@ -59,8 +66,8 @@ export class ExcelView extends TextFileView {
 		this.data = data;
 
 		this.app.workspace.onLayoutReady(async () => {
-			// console.log('setViewData')
-			await this.refresh();
+			// console.log('setViewData', this.file)
+			this.refresh();
 		});
 	}
 
@@ -81,7 +88,7 @@ export class ExcelView extends TextFileView {
 		const reader = new FileReader();
 		reader.onload = (e) => {
 			const data = e.target?.result;
-
+			console.log('handleFile', this.file)
 			if (data) {
 				this.process_wb(XLSX.read(data));
 			} else {
@@ -94,8 +101,17 @@ export class ExcelView extends TextFileView {
 	process_wb(wb: XLSX.WorkBook) {
 		const sheetData = stox(wb);
 		if (sheetData) {
-			this.sheet.loadData(sheetData);
-			this.saveData(JSON.stringify(sheetData));
+			this.sheet.loadData(sheetData)
+			console.log("getdata", this.sheet.getData())
+			this.data = this.headerData() + JSON.stringify(sheetData);
+			console.log("saveData process_wb", this.file)
+			this.save(true)
+				.then(() => {
+					console.log("save data success")
+				})
+				.catch((e) => {
+					console.log("save data error", e)
+				})
 		} else {
 			new Notice(t("DATA_PARSING_ERROR"));
 		}
@@ -129,6 +145,7 @@ export class ExcelView extends TextFileView {
 
 	onload(): void {
 		this.ownerWindow = this.containerEl.win;
+		console.log("onload", this.file)
 
 		// 添加顶部导入按钮
 		this.importEle = this.addAction("download", t("IMPORT_XLSX_FILE"), (ev) =>
@@ -180,6 +197,7 @@ export class ExcelView extends TextFileView {
 
 		// 初始化 sheet
 		const jsonData = JSON.parse(getExcelData(this.data) || "{}") || {};
+		// console.log("refresh", jsonData, this.file)
 
 		// 设置多语言
 		if (moment.locale() === 'zh-cn') {
@@ -248,7 +266,6 @@ export class ExcelView extends TextFileView {
 			.change(() => {
 				// save data to db
 				const data = this.sheet.getData();
-				// console.log("save data to db", data);
 				this.saveData(JSON.stringify(data));
 			})
 			.onAddSheet(() => {
