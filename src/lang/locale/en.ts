@@ -42,4 +42,6 @@ export default {
   ROW_HEIGHT_DESC: "Default row height",
   COLUMN_WIDTH: "Column Width",
   COLUMN_WIDTH_DESC: "Default column width",
+  SHOW_SHEET_BUTTON: "Show Sheet Button",
+  SHOW_SHEET_BUTTON_DESC: "Show Sheet Button",
 };

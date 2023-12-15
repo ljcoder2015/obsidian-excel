@@ -5,7 +5,8 @@ export interface ExcelSettings {
 	sheetHeight: string,
 	rowHeight: string,
 	colWidth: string,
-	theme: string
+	theme: string,
+	showSheetButton: string,
 }
 
 export const DEFAULT_SETTINGS: ExcelSettings = {
@@ -15,5 +16,6 @@ export const DEFAULT_SETTINGS: ExcelSettings = {
 	sheetHeight: "300",
 	rowHeight: "25",
 	colWidth: "100",
-	theme: "light"
+	theme: "light",
+	showSheetButton: "true",
 };

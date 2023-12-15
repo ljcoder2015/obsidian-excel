@@ -104,7 +104,7 @@ export class ExcelView extends TextFileView {
 			this.sheet.loadData(sheetData)
 			console.log("getdata", this.sheet.getData())
 			this.data = this.headerData() + JSON.stringify(sheetData);
-			console.log("saveData process_wb", this.file)
+			// console.log("saveData process_wb", this.file)
 			this.save(true)
 				.then(() => {
 					console.log("save data success")

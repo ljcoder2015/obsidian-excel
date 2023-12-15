@@ -41,4 +41,6 @@ export default {
     ROW_HEIGHT_DESC: "设置表格的默认行高",
     COLUMN_WIDTH: "列宽",
     COLUMN_WIDTH_DESC: "设置表格的默认列宽",
+    SHOW_SHEET_BUTTON: "显示标题按钮",
+    SHOW_SHEET_BUTTON_DESC: "是否显示标题按钮",
 };

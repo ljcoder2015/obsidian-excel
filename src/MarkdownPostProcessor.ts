@@ -208,23 +208,24 @@ const createEditSheetHtml = (
 ): HTMLDivElement => {
 	const sheetDiv = createDiv();
 	
-	// <div class="internal-embed file-embed mod-generic is-loaded" tabindex="-1" src="Excel 2023-09-07 17.18.19.sheet" alt="Excel 2023-09-07 17.18.19.sheet" contenteditable="false"><div class="file-embed-title"><span class="file-embed-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-file"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></span> Excel 2023-09-07 17.18.19.sheet</div></div>
-	const fileEmbed = sheetDiv.createDiv({
-		cls: "internal-embed file-embed mod-generic is-loaded",
-		text: file.basename,
-		attr: {
-			src: file.basename,
-			alt: file.basename,
-			contenteditable: false,
-			tabindex: -1,
-		},
-	});
-
-	// 点击按钮打开 sheet
-	fileEmbed.onClickEvent((e) => {
-		e.stopPropagation();
-		plugin.app.workspace.getLeaf().openFile(file);
-	});
+	if (plugin.settings.showSheetButton == "true") {
+		const fileEmbed = sheetDiv.createDiv({
+			cls: "internal-embed file-embed mod-generic is-loaded",
+			text: file.basename,
+			attr: {
+				src: file.basename,
+				alt: file.basename,
+				contenteditable: false,
+				tabindex: -1,
+			},
+		});
+	
+		// 点击按钮打开 sheet
+		fileEmbed.onClickEvent((e) => {
+			e.stopPropagation();
+			plugin.app.workspace.getLeaf().openFile(file);
+		});
+	}
 
 	var table = getExcelAreaHtml(excelData, sheet, cells);
 		
@@ -255,28 +256,30 @@ const createSheetHtml = (
 ): HTMLDivElement => {
 	const sheetDiv = createDiv();
 
-	const fileEmbed = sheetDiv.createDiv({
-		cls: "internal-embed file-embed mod-generic is-loaded",
-		text: file.basename,
-		attr: {
-			src: file.basename,
-			alt: file.basename,
-			contenteditable: false,
-			tabindex: -1,
-		},
-	});
-
-	// 点击按钮打开 sheet
-	fileEmbed.onClickEvent((e) => {
-		e.stopPropagation();
-		plugin.app.workspace.getLeaf().openFile(file);
-	});
-
-	const sheetEl = createDiv({
-		attr: {
-			style: "overflow-x: auto;"
-		},
-	});
+	if (plugin.settings.showSheetButton == "true") {
+		const fileEmbed = sheetDiv.createDiv({
+			cls: "internal-embed file-embed mod-generic is-loaded",
+			text: file.basename,
+			attr: {
+				src: file.basename,
+				alt: file.basename,
+				contenteditable: false,
+				tabindex: -1,
+			},
+		});
+	
+		// 点击按钮打开 sheet
+		fileEmbed.onClickEvent((e) => {
+			e.stopPropagation();
+			plugin.app.workspace.getLeaf().openFile(file);
+		});
+	
+		const sheetEl = createDiv({
+			attr: {
+				style: "overflow-x: auto;"
+			},
+		});
+	}
 
 	const table = getExcelAreaHtml(data, sheet, cells);
 	sheetEl.appendChild(table);
@@ -295,23 +298,26 @@ const createSheetEl = (
 ): HTMLDivElement => {
 	const sheetDiv = createDiv();
 
+	if (plugin.settings.showSheetButton == "true") {
+		const fileEmbed = sheetDiv.createDiv({
+			cls: "internal-embed file-embed mod-generic is-loaded",
+			text: file.basename,
+			attr: {
+				src: file.basename,
+				alt: file.basename,
+				contenteditable: false,
+				tabindex: -1,
+			},
+		});
+	
+		// 点击按钮打开 sheet
+		fileEmbed.onClickEvent((e) => {
+			e.stopPropagation();
+			plugin.app.workspace.getLeaf().openFile(file);
+		});
+	}
 	// <div class="internal-embed file-embed mod-generic is-loaded" tabindex="-1" src="Excel 2023-09-07 17.18.19.sheet" alt="Excel 2023-09-07 17.18.19.sheet" contenteditable="false"><div class="file-embed-title"><span class="file-embed-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-file"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></span> Excel 2023-09-07 17.18.19.sheet</div></div>
-	const fileEmbed = sheetDiv.createDiv({
-		cls: "internal-embed file-embed mod-generic is-loaded",
-		text: file.basename,
-		attr: {
-			src: file.basename,
-			alt: file.basename,
-			contenteditable: false,
-			tabindex: -1,
-		},
-	});
-
-	// 点击按钮打开 sheet
-	fileEmbed.onClickEvent((e) => {
-		e.stopPropagation();
-		plugin.app.workspace.getLeaf().openFile(file);
-	});
+	
 
 	const sheetEl = createDiv({
 		cls: "sheet-iframe",

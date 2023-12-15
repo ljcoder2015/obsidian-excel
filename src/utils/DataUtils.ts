@@ -49,10 +49,12 @@ export const getExcelAreaData = (
 			newData.set("validations", sheetData.validations);
 			newData.set("merges", sheetData.merges);
 
+			console.log("------", jsonData, cells, sheetData);
 			var sri = 0;
 			var sci = 0;
-			var eri = sheetData.rows.len - 1;
-			var eci = sheetData.cols.len - 1;
+			var eri = 100;
+			var eci = 26;
+
 			if (cells.includes(":")) {
 				var cellArray = cells.split(":");
 				const start = cellArray[0].split("-");
@@ -62,8 +64,15 @@ export const getExcelAreaData = (
 				const end = cellArray[1].split("-");
 				var eri = parseInt(end[0]); // 结束行
 				var eci = parseInt(end[1]); // 结束列
+			} else {
+				if (sheetData.rows && sheetData.rows.len) {
+					eri = sheetData.rows.len - 1;
+				}
+				if (sheetData.cols && sheetData.cols.len) {
+					eci = sheetData.cols.len - 1;
+				}
 			}
-			
+
 			var rowLen = eri - sri + 1;
 			// 用来存储新数据
 			var rows = new Map<string, any>();
@@ -157,8 +166,8 @@ export const getExcelAreaHtml = (
 		if (sheetData) {
 			var sri = 0;
 			var sci = 0;
-			var eri = sheetData.rows.len - 1;
-			var eci = sheetData.cols.len - 1;
+			var eri = 100;
+			var eci = 26;
 			if (cells.includes(":")) {
 				var cellArray = cells.split(":");
 				const start = cellArray[0].split("-");
@@ -168,6 +177,13 @@ export const getExcelAreaHtml = (
 				const end = cellArray[1].split("-");
 				var eri = parseInt(end[0]); // 结束行
 				var eci = parseInt(end[1]); // 结束列
+			} else {
+				if (sheetData.rows && sheetData.rows.len) {
+					eri = sheetData.rows.len - 1;
+				}
+				if (sheetData.cols && sheetData.cols.len) {
+					eci = sheetData.cols.len - 1;
+				}
 			}
 
 			// console.log("getExcelAreaHtml", cells, sri, sci, eri, eci);
