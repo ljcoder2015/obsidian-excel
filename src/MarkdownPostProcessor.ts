@@ -273,13 +273,13 @@ const createSheetHtml = (
 			e.stopPropagation();
 			plugin.app.workspace.getLeaf().openFile(file);
 		});
-	
-		const sheetEl = createDiv({
-			attr: {
-				style: "overflow-x: auto;"
-			},
-		});
 	}
+
+	const sheetEl = createDiv({
+		attr: {
+			style: "overflow-x: auto;"
+		},
+	});
 
 	const table = getExcelAreaHtml(data, sheet, cells);
 	sheetEl.appendChild(table);
