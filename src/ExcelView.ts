@@ -51,7 +51,7 @@ export class ExcelView extends TextFileView {
 		// console.log("saveData", this.data)
 		this.save(false)
 			.then(() => {
-				// console.log("save data success", this.file)
+				console.log("save data success", this.file)
 			})
 			.catch((e) => {
 				console.log("save data error", e)
@@ -86,11 +86,12 @@ export class ExcelView extends TextFileView {
 		}
 		const f = files[0];
 		const reader = new FileReader();
+		const self = this
 		reader.onload = (e) => {
 			const data = e.target?.result;
-			console.log('handleFile', this.file)
+			console.log('handleFile', self.file)
 			if (data) {
-				this.process_wb(XLSX.read(data));
+				self.process_wb(XLSX.read(data));
 			} else {
 				new Notice(t("READ_FILE_FAILED"));
 			}
@@ -102,16 +103,7 @@ export class ExcelView extends TextFileView {
 		const sheetData = stox(wb);
 		if (sheetData) {
 			this.sheet.loadData(sheetData)
-			console.log("getdata", this.sheet.getData())
-			this.data = this.headerData() + JSON.stringify(sheetData);
-			// console.log("saveData process_wb", this.file)
-			this.save(true)
-				.then(() => {
-					console.log("save data success")
-				})
-				.catch((e) => {
-					console.log("save data error", e)
-				})
+			this.saveData(JSON.stringify(sheetData))
 		} else {
 			new Notice(t("DATA_PARSING_ERROR"));
 		}
