@@ -102,6 +102,12 @@ export class ExcelView extends TextFileView {
 	process_wb(wb: XLSX.WorkBook) {
 		const sheetData = stox(wb);
 		if (sheetData) {
+			sheetData.forEach((sheet) => {
+				if (sheet.rows) {
+					const last = Object.keys(sheet.rows).last() || "100"
+					sheet.rows.len = Math.max(100, parseInt(last) + 20)
+				}
+			})
 			this.sheet.loadData(sheetData)
 			this.saveData(JSON.stringify(sheetData))
 		} else {
