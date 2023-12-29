@@ -116,6 +116,32 @@ export class ExcelSettingTab extends PluginSettingTab {
             )
 
         new Setting(containerEl)
+            .setName(t("DEFAULT_ROWS_LEN"))
+            .setDesc(t("DEFAULT_ROWS_LEN_DESC"))
+            .addText((text) => 
+                text
+                    .setPlaceholder("100")
+                    .setValue(this.plugin.settings.defaultRowsLen)
+                    .onChange(async (value) => {
+                        this.plugin.settings.defaultRowsLen = value
+                        this.plugin.saveSettings()
+                    })
+            )
+
+        new Setting(containerEl)
+            .setName(t("DEFAULT_COLS_LEN"))
+            .setDesc(t("DEFAULT_COLS_LEN_DESC"))
+            .addText((text) => 
+                text
+                    .setPlaceholder("26")
+                    .setValue(this.plugin.settings.defaultColsLen)
+                    .onChange(async (value) => {
+                        this.plugin.settings.defaultColsLen = value
+                        this.plugin.saveSettings()
+                    })
+            )
+
+        new Setting(containerEl)
             .setName(t("SHOW_SHEET_BUTTON"))
             .setDesc(t("SHOW_SHEET_BUTTON_DESC"))
             .addDropdown((dropdown) =>

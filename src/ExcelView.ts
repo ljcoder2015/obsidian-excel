@@ -109,8 +109,8 @@ export class ExcelView extends TextFileView {
 					sheetAny.rows.len = Math.max(100, parseInt(last) + 20)
 				}
 			})
-			this.sheet.loadData(sheetData)
 			this.saveData(JSON.stringify(sheetData))
+			this.refresh()
 		} else {
 			new Notice(t("DATA_PARSING_ERROR"));
 		}
@@ -248,11 +248,11 @@ export class ExcelView extends TextFileView {
 				width: () => this.contentEl.clientWidth - 32,
 			},
 			row: {
-				len: 100,
+				len: parseInt(this.plugin.settings.defaultRowsLen),
 				height: parseInt(this.plugin.settings.rowHeight),
 			},
 			col: {
-				len: 26,
+				len: parseInt(this.plugin.settings.defaultColsLen),
 				width: parseInt(this.plugin.settings.colWidth),
 				indexWidth: 60,
 				minWidth: 60,

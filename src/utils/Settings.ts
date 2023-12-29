@@ -7,6 +7,8 @@ export interface ExcelSettings {
 	colWidth: string,
 	theme: string,
 	showSheetButton: string,
+	defaultRowsLen: string,
+	defaultColsLen: string,
 }
 
 export const DEFAULT_SETTINGS: ExcelSettings = {
@@ -18,4 +20,6 @@ export const DEFAULT_SETTINGS: ExcelSettings = {
 	colWidth: "100",
 	theme: "light",
 	showSheetButton: "true",
+	defaultRowsLen: "100",
+	defaultColsLen: "26",
 };

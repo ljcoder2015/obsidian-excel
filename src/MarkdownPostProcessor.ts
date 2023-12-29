@@ -375,11 +375,11 @@ const createSheetEl = (
 			width: () => width - 10,
 		},
 		row: {
-			len: 100,
+			len: parseInt(plugin.settings.defaultRowsLen),
 			height: parseInt(plugin.settings.rowHeight),
 		},
 		col: {
-			len: 26,
+			len: parseInt(plugin.settings.defaultColsLen),
 			width: parseInt(plugin.settings.colWidth),
 			indexWidth: 60,
 			minWidth: 60,

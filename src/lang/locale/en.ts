@@ -42,6 +42,10 @@ export default {
   ROW_HEIGHT_DESC: "Default row height",
   COLUMN_WIDTH: "Column Width",
   COLUMN_WIDTH_DESC: "Default column width",
+  DEFAULT_ROWS_LEN: 'Default render rows',
+  DEFAULT_ROWS_LEN_DESC: 'Default number of render rows',
+  DEFAULT_COLS_LEN: 'Default render columns',
+  DEFAULT_COLS_LEN_DESC: 'Default number of rendered columns',
   SHOW_SHEET_BUTTON: "Show Sheet Button",
   SHOW_SHEET_BUTTON_DESC: "Show Sheet Button",
 };
