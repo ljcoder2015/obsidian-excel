@@ -103,9 +103,10 @@ export class ExcelView extends TextFileView {
 		const sheetData = stox(wb);
 		if (sheetData) {
 			sheetData.forEach((sheet) => {
-				if (sheet.rows) {
-					const last = Object.keys(sheet.rows).last() || "100"
-					sheet.rows.len = Math.max(100, parseInt(last) + 20)
+				var sheetAny = sheet as any
+				if (sheetAny.rows) {
+					const last = Object.keys(sheetAny.rows).last() || "100"
+					sheetAny.rows.len = Math.max(100, parseInt(last) + 20)
 				}
 			})
 			this.sheet.loadData(sheetData)
