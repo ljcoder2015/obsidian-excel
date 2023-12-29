@@ -106,7 +106,8 @@ export class ExcelView extends TextFileView {
 				var sheetAny = sheet as any
 				if (sheetAny.rows) {
 					const last = Object.keys(sheetAny.rows).last() || "100"
-					sheetAny.rows.len = Math.max(100, parseInt(last) + 20)
+					const max = parseInt(this.plugin.settings.defaultRowsLen)
+					sheetAny.rows.len = Math.max(max, parseInt(last) + 20)
 				}
 			})
 			this.saveData(JSON.stringify(sheetData))
