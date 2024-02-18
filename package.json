@@ -28,7 +28,7 @@
 	},
 	"dependencies": {
 		"monkey-around": "^2.3.0",
-		"x-data-spreadsheet": "git+ssh://git@github.com:ljcoder2015/x-spreadsheet.git#1.1.3",
+		"x-data-spreadsheet": "git+ssh://git@github.com:ljcoder2015/x-spreadsheet.git#1.1.4",
 		"xlsx": "https://cdn.sheetjs.com/xlsx-0.20.0/xlsx-0.20.0.tgz"
 	}
 }
