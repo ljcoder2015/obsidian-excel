@@ -11,7 +11,7 @@
 
 **Online demo: https://univer.ai/examples/sheets/**
 
-**Discord: https://discord.gg/uFrd5XpH**
+**Discord: https://discord.gg/fufpbG4tJg**
 
 # Obsidian Excel Plugin
 
