@@ -1,7 +1,7 @@
 # Obsidian Excel Plus Plugin
 
 
-**Obsidian-Excel-Plus** has been refactored using the [Univer](https://github.com/dream-num/univer) framework to replace `Obsidian-excel`. 
+**[Obsidian-Excel-Plus](https://github.com/ljcoder2015/obsidian-excel-plus)** has been refactored using the [Univer](https://github.com/dream-num/univer) framework to replace `Obsidian-excel`. 
 - It is based on a Canvas rendering engine and a formula engine, supports Web Worker, ensuring high performance while also supporting large-scale data processing.
 
 - The core features and capabilities of Univer are provided through plugins, making it easy to extend.
