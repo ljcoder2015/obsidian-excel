@@ -6,8 +6,6 @@
 
 - The core features and capabilities of Univer are provided through plugins, making it easy to extend.
 
-**The Obsidian-Excel plugin will no longer be maintained or updated. To download Obsidian-Excel-Plus, please visit [https://github.com/ljcoder2015/obsidian-excel-plus](https://github.com/ljcoder2015/obsidian-excel-plus)**
-
 > Due to the use of a new architecture, files created with the `obsidian-excel` plugin are not compatible.
 
 
@@ -16,6 +14,8 @@
 **Discord: https://discord.com/invite/xckVHRYv**
 
 # Obsidian Excel Plugin
+
+### **The Obsidian-Excel plugin will no longer be maintained or updated. To download Obsidian-Excel-Plus, please visit [https://github.com/ljcoder2015/obsidian-excel-plus](https://github.com/ljcoder2015/obsidian-excel-plus)**
 
 ## Excel
 The Obsidian-Excel plugin integrates [x-spreadsheet](https://github.com/myliang/x-spreadsheet), a feature sheet tool, into Obsidian. You can store and edit `xlsx` files in your vault.
