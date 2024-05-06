@@ -1,19 +1,19 @@
-# Obsidian Excel Pro Plugin
-**Obsidian Excel Pro** is here to revolutionize the way you handle spreadsheets within Obsidian. Built upon the foundation of its highly acclaimed predecessor, [Obsidian Excel](https://github.com/ljcoder2015/obsidian-excel), which has garnered over 25,000 users worldwide, **Obsidian Excel Pro** takes your experience to the next level.
+# Obsidian Excel Plus Plugin
+
+
+**Obsidian-Excel-Plus** has been refactored using the [Univer](https://github.com/dream-num/univer) framework to replace `Obsidian-excel`. 
+- It is based on a Canvas rendering engine and a formula engine, supports Web Worker, ensuring high performance while also supporting large-scale data processing.
+
+- The core features and capabilities of Univer are provided through plugins, making it easy to extend.
+
+**The Obsidian-Excel plugin will no longer be maintained or updated. To download Obsidian-Excel-Plus, please visit [https://github.com/ljcoder2015/obsidian-excel-plus](https://github.com/ljcoder2015/obsidian-excel-plus)**
+
+> Due to the use of a new architecture, files created with the `obsidian-excel` plugin are not compatible.
+
 
 **Online demo: https://univer.ai/examples/sheets/**
 
-**Buy now:  https://www.patreon.com/obsidianExcelPro/membership**
-
 **Discord: https://discord.com/invite/xckVHRYv**
-
-
-Obsidian Excel Pro 现已面世，它将彻底改变您在 Obsidian 中处理电子表格的方式。基于备受赞誉的前身 Obsidian Excel 所奠定的基础上，后者已在全球范围内拥有超过 25,000 名用户。Obsidian Excel Pro 将您的体验提升到一个全新的层次。
-
-**在线预览: https://univer.ai/examples/sheets/**
-
-**购买地址: https://t.zsxq.com/ZMoYN**
-
 
 # Obsidian Excel Plugin
 
