@@ -15,7 +15,8 @@
 
 # Obsidian Excel Plugin
 
-### **The Obsidian-Excel plugin will no longer be maintained or updated. To download Obsidian-Excel-Plus, please visit [https://github.com/ljcoder2015/obsidian-excel-plus](https://github.com/ljcoder2015/obsidian-excel-plus)**
+> ### The Obsidian-Excel plugin will no longer be maintained or updated. To download Obsidian-Excel-Plus, please visit [https://github.com/ljcoder2015/obsidian-excel-plus](https://github.com/ljcoder2015/obsidian-excel-plus)
+> ### Obsidian-Excel插件不再更新维护，旧功能不满足可以尝试使用新插件Obsidian-Excel-Plus。下载地址 [https://github.com/ljcoder2015/obsidian-excel-plus](https://github.com/ljcoder2015/obsidian-excel-plus)
 
 ## Excel
 The Obsidian-Excel plugin integrates [x-spreadsheet](https://github.com/myliang/x-spreadsheet), a feature sheet tool, into Obsidian. You can store and edit `xlsx` files in your vault.
