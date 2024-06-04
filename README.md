@@ -1,22 +1,7 @@
-# Obsidian Excel Plus Plugin
-
-
-**[Obsidian-Excel-Plus](https://github.com/ljcoder2015/obsidian-excel-plus)** has been refactored using the [Univer](https://github.com/dream-num/univer) framework to replace `Obsidian-excel`. 
-- It is based on a Canvas rendering engine and a formula engine, supports Web Worker, ensuring high performance while also supporting large-scale data processing.
-
-- The core features and capabilities of Univer are provided through plugins, making it easy to extend.
-
-> Due to the use of a new architecture, files created with the `obsidian-excel` plugin are not compatible.
-
-
-**Online demo: https://univer.ai/examples/sheets/**
-
-**Discord: https://discord.gg/fufpbG4tJg**
+> ### The Obsidian-Excel plugin will no longer be maintained or updated. To download Obsidian-Sheet-Plus, please visit [https://github.com/ljcoder2015/obsidian-sheet-plus](https://github.com/ljcoder2015/obsidian-sheet-plus)
+> ### Obsidian-Excel插件不再更新维护，旧功能不满足可以尝试使用新插件Obsidian-Sheet-Plus。下载地址 [https://github.com/ljcoder2015/obsidian-sheet-plus](https://github.com/ljcoder2015/obsidian-sheet-plus)
 
 # Obsidian Excel Plugin
-
-> ### The Obsidian-Excel plugin will no longer be maintained or updated. To download Obsidian-Excel-Plus, please visit [https://github.com/ljcoder2015/obsidian-excel-plus](https://github.com/ljcoder2015/obsidian-excel-plus)
-> ### Obsidian-Excel插件不再更新维护，旧功能不满足可以尝试使用新插件Obsidian-Excel-Plus。下载地址 [https://github.com/ljcoder2015/obsidian-excel-plus](https://github.com/ljcoder2015/obsidian-excel-plus)
 
 ## Excel
 The Obsidian-Excel plugin integrates [x-spreadsheet](https://github.com/myliang/x-spreadsheet), a feature sheet tool, into Obsidian. You can store and edit `xlsx` files in your vault.
